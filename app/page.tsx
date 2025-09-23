@@ -133,7 +133,7 @@ export default function DashboardPage() {
               Dati Provinciali
             </button>
             <a 
-              href="https://pro.lastello.it/" 
+              href="https://lastello.it/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="rounded-full px-3 py-2 text-sm font-medium hover:bg-white/70 bg-white text-blue-600 shadow-md inline-flex items-center transition-all duration-200 hover:scale-105"

@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Download, Mail, Calendar, Globe } from 'lucide-react'
+import { Download, Mail, Calendar, Globe, LogOut } from 'lucide-react'
+import { AuthGuard } from '@/components/auth-guard'
+import { logout } from '@/lib/auth'
 
 interface Subscription {
   id: number
@@ -16,7 +18,7 @@ interface Subscription {
   source: string
 }
 
-export default function NewsletterPage() {
+function NewsletterContent() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -76,13 +78,27 @@ export default function NewsletterPage() {
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Gestione Newsletter
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300">
-          Visualizza e gestisci le iscrizioni alla newsletter degli aggiornamenti mensili
-        </p>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Gestione Newsletter
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Visualizza e gestisci le iscrizioni alla newsletter degli aggiornamenti mensili
+          </p>
+        </div>
+        <Button
+          onClick={() => {
+            logout()
+            window.location.reload()
+          }}
+          variant="outline"
+          size="sm"
+          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          Logout
+        </Button>
       </div>
 
       {/* Statistiche */}
@@ -209,5 +225,13 @@ export default function NewsletterPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function NewsletterPage() {
+  return (
+    <AuthGuard>
+      <NewsletterContent />
+    </AuthGuard>
   )
 }

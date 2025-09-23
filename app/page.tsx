@@ -253,7 +253,7 @@ export default function DashboardPage() {
 
             {/* Charts Section */}
             <div className="grid gap-6 lg:grid-cols-12">
-              <Card className="col-span-8 modern-card glow">
+              <Card className="col-span-12 lg:col-span-8 modern-card glow">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Activity className="h-5 w-5 text-blue-500" />

@@ -139,7 +139,9 @@ export function DeathsVariationChart() {
                   const { cx, cy, payload } = props;
                   
                   if (showPercentages) {
-                    if (payload.variationPercent === null) return null;
+                    if (payload.variationPercent === null) {
+                      return <circle cx={cx} cy={cy} r={0} fill="transparent" />;
+                    }
                     const isPositive = payload.variationPercent > 0;
                     const isHighVariation = Math.abs(payload.variationPercent) > 5;
                     

@@ -4,14 +4,14 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { X, Mail, Bell, CheckCircle } from 'lucide-react'
+import { X, Mail, Bell, CheckCircle, ChevronUp, ChevronDown } from 'lucide-react'
 
 export function NewsletterSignup() {
   const [isVisible, setIsVisible] = useState(false)
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [isDismissed, setIsDismissed] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
 
   // Mostra il popup quando l'utente scrolla oltre la metà della pagina
   useEffect(() => {
@@ -133,16 +133,25 @@ export function NewsletterSignup() {
     }
   }
 
+  const handleMinimize = () => {
+    setIsMinimized(true)
+    console.log('Newsletter: Popup minimized')
+  }
+
+  const handleMaximize = () => {
+    setIsMinimized(false)
+    console.log('Newsletter: Popup maximized')
+  }
+
   const handleDismiss = () => {
-    setIsDismissed(true)
     setIsVisible(false)
-    // Salva che è stato chiuso per non mostrarlo più
+    // Salva che è stato chiuso definitivamente per non mostrarlo più
     localStorage.setItem('newsletter-dismissed', 'true')
-    console.log('Newsletter: Popup dismissed and saved to localStorage')
+    console.log('Newsletter: Popup dismissed permanently')
   }
 
 
-  if (!isVisible || isDismissed) {
+  if (!isVisible) {
     return null
   }
 
@@ -155,65 +164,91 @@ export function NewsletterSignup() {
               <Bell className="h-5 w-5 text-blue-500" />
               Aggiornamenti Mensili
             </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDismiss}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            <div className="flex gap-1">
+              {isMinimized ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleMaximize}
+                  className="h-8 w-8 p-0"
+                  title="Espandi"
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleMinimize}
+                  className="h-8 w-8 p-0"
+                  title="Minimizza"
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDismiss}
+                className="h-8 w-8 p-0"
+                title="Chiudi definitivamente"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardHeader>
         
-        <CardContent>
-          {!isSubmitted ? (
-            <>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                Ricevi ogni mese gli ultimi dati e insights del settore funebre direttamente nella tua casella di posta.
-              </p>
-              
-              <form onSubmit={handleSubmit} className="space-y-3">
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      type="email"
-                      placeholder="La tua email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
+        {!isMinimized && (
+          <CardContent>
+            {!isSubmitted ? (
+              <>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  Ricevi ogni mese gli ultimi dati e insights del settore funebre direttamente nella tua casella di posta.
+                </p>
+                
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        type="email"
+                        placeholder="La tua email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting || !email}
+                      className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
+                    >
+                      {isSubmitting ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        'Iscriviti'
+                      )}
+                    </Button>
                   </div>
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting || !email}
-                    className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
-                  >
-                    {isSubmitting ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      'Iscriviti'
-                    )}
-                  </Button>
-                </div>
-              </form>
+                </form>
 
-            </>
-          ) : (
-            <div className="text-center py-2">
-              <div className="text-3xl mb-2">🎉</div>
-              <p className="text-green-600 dark:text-green-400 font-medium flex items-center justify-center gap-2">
-                <CheckCircle className="h-4 w-4" />
-                Iscritto con successo!
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Riceverai il primo aggiornamento il prossimo mese
-              </p>
-            </div>
-          )}
-        </CardContent>
+              </>
+            ) : (
+              <div className="text-center py-2">
+                <div className="text-3xl mb-2">🎉</div>
+                <p className="text-green-600 dark:text-green-400 font-medium flex items-center justify-center gap-2">
+                  <CheckCircle className="h-4 w-4" />
+                  Iscritto con successo!
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Riceverai il primo aggiornamento il prossimo mese
+                </p>
+              </div>
+            )}
+          </CardContent>
+        )}
       </Card>
     </div>
   )

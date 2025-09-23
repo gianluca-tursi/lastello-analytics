@@ -96,7 +96,7 @@ export function NewsletterSignup() {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 w-80 max-w-[calc(100vw-3rem)] animate-in slide-in-from-left-2 duration-500">
+    <div className="fixed bottom-6 left-6 z-50 w-80 max-w-[calc(100vw-3rem)] animate-slide-in">
       <Card className="shadow-2xl border-2 border-blue-200 bg-white dark:bg-gray-800">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">

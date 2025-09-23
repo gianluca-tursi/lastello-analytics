@@ -14,12 +14,13 @@ import { TrendEvolutionChart } from '@/components/dashboard/trend-evolution-char
 import { DeathsVariationChart } from '@/components/dashboard/deaths-variation-chart';
 import { ProvinceChart } from '@/components/dashboard/province-chart';
 import { FeedbackSystem } from '@/components/feedback-system';
-import { TrendingUp, Users, Euro, Building2, Activity, BarChart3, Globe, Sparkles } from 'lucide-react';
+import { TrendingUp, Users, Euro, Building2, Activity, BarChart3, Globe, Sparkles, X } from 'lucide-react';
 
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const [trendType, setTrendType] = useState<'Crescente' | 'Moderato' | 'Decrescente'>('Crescente');
+  const [showViewportTip, setShowViewportTip] = useState(true);
   
   const handleGoToProvinces = () => {
     const el = document.getElementById('province-section');
@@ -46,6 +47,23 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+      {showViewportTip && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-lg px-4 py-2 flex items-center gap-3">
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              Per una migliore esperienza, visualizza da desktop o ruota il telefono in orizzontale per vedere meglio i grafici.
+            </span>
+            <button
+              type="button"
+              aria-label="Chiudi suggerimento"
+              onClick={() => setShowViewportTip(false)}
+              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            >
+              <X className="h-4 w-4 text-gray-500" />
+            </button>
+          </div>
+        </div>
+      )}
       {/* Header with gradient */}
       <div className="animated-gradient text-white">
         <div className="container mx-auto px-4 py-8">

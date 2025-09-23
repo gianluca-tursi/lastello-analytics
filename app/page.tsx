@@ -151,14 +151,14 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-                    Alto
+                    Normale/Alto
                   </div>
                   <div className="flex items-center gap-1 mt-2">
                     <span className="text-xs font-medium text-green-600 dark:text-green-400">
                       ↗
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      sopra il trend storico
+                      sopra il trend storico, ma settembre mese con bassa stagionalità
                     </span>
                   </div>
                 </CardContent>

@@ -1,70 +1,77 @@
-# Sistema di Feedback - Salvataggio in File
+# Sistema di Feedback - Salvataggio in localStorage
 
-## 🚀 Sistema Semplificato
+## Come Funziona
 
-Il sistema ora salva i feedback in un file JSON locale! Molto più semplice e pratico.
+Il sistema di feedback ora salva automaticamente tutti i feedback nel localStorage del browser dell'utente. Questo elimina la necessità di API routes e semplifica il deployment.
 
-### 1. Come Funziona
+## Visualizza i Feedback
 
-- I feedback vengono salvati in `data/feedback.json`
-- Ogni feedback ha un ID univoco e timestamp
-- Include rating, suggerimento, IP e browser info
-- File JSON facilmente leggibile
+1. **Tramite Browser**: Apri la console del browser (F12) e digita:
+   ```javascript
+   JSON.parse(localStorage.getItem('dashboard-feedback') || '[]')
+   ```
+2. **Download**: Puoi copiare i dati dalla console e salvarli in un file JSON
 
-### 2. Visualizza i Feedback
-
-**Opzione 1 - Pagina Web:**
-1. Vai su `http://localhost:3000/feedback`
-2. Vedi tutti i feedback in formato leggibile
-3. Scarica il file JSON
-
-**Opzione 2 - File Diretto:**
-1. Apri `data/feedback.json` nel progetto
-2. Leggi direttamente il file JSON
-
-### 3. Testa il Sistema
+## Testa il Sistema
 
 1. Avvia il server: `npm run dev`
 2. Vai su `http://localhost:3000`
-3. Clicca sul pulsante di feedback
-4. Invia un test
-5. Vai su `http://localhost:3000/feedback` per vedere il risultato
+3. Clicca sul pulsante di feedback in basso a destra
+4. Compila il form e invia
+5. Controlla che il feedback sia stato salvato nel localStorage
 
-## 🔧 Funzionalità
+## Funzionalità
 
-- ✅ **Salvataggio automatico** in file JSON
-- ✅ **Pagina di visualizzazione** dedicata
-- ✅ **Download del file** JSON
-- ✅ **Gestione errori** completa
-- ✅ **Feedback visivo** all'utente
-- ✅ **Nessuna configurazione** richiesta
+- ✅ Salvataggio automatico nel localStorage
+- ✅ Nessuna dipendenza da API routes
+- ✅ Compatibile con deployment statico
+- ✅ Gestione errori completa
+- ✅ Nessuna configurazione richiesta
+- ✅ Feedback visivo all'utente
 
-## 📄 Formato Dati
+## Formato Dati
 
-Ogni feedback include:
-- **ID univoco** e timestamp
-- **Valutazione** con emoji e label
-- **Suggerimento** dell'utente
-- **IP e User Agent** per debugging
-- **Data formattata** in italiano
+I feedback vengono salvati nel seguente formato:
 
-## 📁 Struttura File
-
+```json
+[
+  {
+    "id": 1234567890,
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "date": "15/01/2024",
+    "rating": 4,
+    "emoji": "😊",
+    "label": "Positivo",
+    "suggestion": "Suggerimento dell'utente",
+    "userAgent": "Mozilla/5.0...",
+    "url": "http://localhost:3000"
+  }
+]
 ```
-data/
-└── feedback.json
-```
 
-## 🛠️ Troubleshooting
+## Vantaggi
 
-### File non creato
-- Verifica che la directory `data/` sia scrivibile
-- Controlla i permessi del progetto
+- **Semplice**: Nessuna configurazione server richiesta
+- **Veloce**: Salvataggio istantaneo nel browser
+- **Compatibile**: Funziona con qualsiasi hosting statico
+- **Privato**: I dati rimangono nel browser dell'utente
 
-### Pagina feedback non carica
-- Verifica che il server sia in esecuzione
-- Controlla la console per errori
+## Come Recuperare i Feedback
 
-### Feedback non salvati
-- Controlla i log del server
-- Verifica che l'API `/api/send-feedback` funzioni
+Per raccogliere i feedback dagli utenti, puoi:
+
+1. **Chiedere agli utenti** di esportare i loro dati dalla console
+2. **Implementare un sistema di export** che permetta di scaricare i dati
+3. **Usare un servizio esterno** come Google Forms o Typeform
+
+## Troubleshooting
+
+### I feedback non vengono salvati
+- Controlla che il browser supporti localStorage
+- Verifica la console del browser per errori
+- Assicurati che non ci siano estensioni che bloccano localStorage
+
+### Non riesco a vedere i feedback
+- Apri la console del browser (F12)
+- Digita: `localStorage.getItem('dashboard-feedback')`
+- Se restituisce `null`, non ci sono feedback salvati

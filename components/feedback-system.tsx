@@ -22,7 +22,7 @@ export function FeedbackSystem() {
     { emoji: '🤩', value: 5, label: 'Eccellente' }
   ];
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!rating) {
       alert('Per favore, seleziona una valutazione');
       return;
@@ -33,37 +33,37 @@ export function FeedbackSystem() {
     try {
       const selectedEmoji = emojis.find(e => e.value === rating);
       
-      // Invia il feedback tramite API
-      const response = await fetch('/api/send-feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          rating,
-          suggestion,
-          emoji: selectedEmoji?.emoji,
-          label: selectedEmoji?.label,
-        }),
-      });
+      // Salva il feedback nel localStorage
+      const feedback = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleDateString('it-IT'),
+        rating,
+        emoji: selectedEmoji?.emoji,
+        label: selectedEmoji?.label,
+        suggestion: suggestion.trim(),
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+      };
 
-      const result = await response.json();
+      // Recupera i feedback esistenti
+      const existingFeedback = JSON.parse(localStorage.getItem('dashboard-feedback') || '[]');
+      existingFeedback.push(feedback);
+      
+      // Salva nel localStorage
+      localStorage.setItem('dashboard-feedback', JSON.stringify(existingFeedback));
 
-      if (result.success) {
-        setIsSubmitted(true);
-        setTimeout(() => {
-          setIsSubmitted(false);
-          setIsOpen(false);
-          setRating(null);
-          setSuggestion('');
-        }, 3000);
-      } else {
-        throw new Error(result.message);
-      }
+      setIsSubmitted(true);
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setIsOpen(false);
+        setRating(null);
+        setSuggestion('');
+      }, 3000);
 
     } catch (error) {
-      console.error('Errore invio feedback:', error);
-      alert('Errore nell\'invio del feedback. Riprova più tardi.');
+      console.error('Errore salvataggio feedback:', error);
+      alert('Errore nel salvataggio del feedback. Riprova più tardi.');
     } finally {
       setIsSubmitting(false);
     }

@@ -254,7 +254,9 @@ export function Overview() {
             stroke="none"
             dot={(props) => {
               const { cx, cy, payload, index } = props;
-              if (!payload.stime2025) return null;
+              if (!payload.stime2025) {
+                return <circle cx={cx} cy={cy} r={0} fill="transparent" />;
+              }
               return (
                 <g key={`stima-dot-${index}`}>
                   <text

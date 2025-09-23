@@ -236,7 +236,7 @@ export default function DashboardPage() {
                         Alessandro
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">
-                        Marketing Specialist
+                        Supporto Clienti
                       </div>
                     </div>
                   </div>

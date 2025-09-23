@@ -6,7 +6,8 @@ import React from 'react';
 // Dati del Termometro mortalità - Italia (aggiornati con dati ISTAT)
 const data = [
   { 
-    month: 'Gennaio', 
+    month: 'Gen', 
+    monthFull: 'Gennaio',
     p25: 66127, 
     p75: 72424, 
     bandaWidth: 72424 - 66127, // Larghezza della banda
@@ -16,7 +17,8 @@ const data = [
     classificazione: null
   },
   { 
-    month: 'Febbraio', 
+    month: 'Feb', 
+    monthFull: 'Febbraio',
     p25: 56743, 
     p75: 59996, 
     bandaWidth: 59996 - 56743,
@@ -26,7 +28,8 @@ const data = [
     classificazione: null
   },
   { 
-    month: 'Marzo', 
+    month: 'Mar', 
+    monthFull: 'Marzo',
     p25: 57279, 
     p75: 66866, 
     bandaWidth: 66866 - 57279,
@@ -36,7 +39,8 @@ const data = [
     classificazione: null
   },
   { 
-    month: 'Aprile', 
+    month: 'Apr', 
+    monthFull: 'Aprile',
     p25: 52329, 
     p75: 61857, 
     bandaWidth: 61857 - 52329,
@@ -46,7 +50,8 @@ const data = [
     classificazione: null
   },
   { 
-    month: 'Maggio', 
+    month: 'Mag', 
+    monthFull: 'Maggio',
     p25: 50882, 
     p75: 54211, 
     bandaWidth: 54211 - 50882,
@@ -56,7 +61,8 @@ const data = [
     classificazione: null
   },
   { 
-    month: 'Giugno', 
+    month: 'Giu', 
+    monthFull: 'Giugno',
     p25: 48190, 
     p75: 51985, 
     bandaWidth: 51985 - 48190,
@@ -66,7 +72,8 @@ const data = [
     classificazione: null
   },
   { 
-    month: 'Luglio', 
+    month: 'Lug', 
+    monthFull: 'Luglio',
     p25: 52142, 
     p75: 54477, 
     bandaWidth: 54477 - 52142,
@@ -76,7 +83,8 @@ const data = [
     classificazione: 'NORMALE'
   },
   { 
-    month: 'Agosto', 
+    month: 'Ago', 
+    monthFull: 'Agosto',
     p25: 52297, 
     p75: 56433, 
     bandaWidth: 56433 - 52297,
@@ -86,7 +94,8 @@ const data = [
     classificazione: 'BASSO'
   },
   { 
-    month: 'Settembre', 
+    month: 'Set', 
+    monthFull: 'Settembre',
     p25: 48420, 
     p75: 50974, 
     bandaWidth: 50974 - 48420,
@@ -96,7 +105,8 @@ const data = [
     classificazione: 'ALTO'
   },
   { 
-    month: 'Ottobre', 
+    month: 'Ott', 
+    monthFull: 'Ottobre',
     p25: 51839, 
     p75: 54839, 
     bandaWidth: 54839 - 51839,
@@ -106,7 +116,8 @@ const data = [
     classificazione: null
   },
   { 
-    month: 'Novembre', 
+    month: 'Nov', 
+    monthFull: 'Novembre',
     p25: 54337, 
     p75: 56353, 
     bandaWidth: 56353 - 54337,
@@ -116,7 +127,8 @@ const data = [
     classificazione: null
   },
   { 
-    month: 'Dicembre', 
+    month: 'Dic', 
+    monthFull: 'Dicembre',
     p25: 60910, 
     p75: 67361, 
     bandaWidth: 67361 - 60910,
@@ -133,7 +145,7 @@ export function Overview() {
       const data = payload[0].payload;
       return (
         <div className="rounded-lg border bg-white dark:bg-gray-800 p-3 shadow-lg">
-          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{label}</p>
+          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{data.monthFull || label}</p>
           <div className="mt-2 space-y-1">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-yellow-200"></div>

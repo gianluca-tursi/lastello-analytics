@@ -149,9 +149,6 @@ export function NewsletterSignup() {
                 </div>
               </form>
 
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                Solo aggiornamenti mensili. Nessuno spam. Cancellati quando vuoi.
-              </p>
             </>
           ) : (
             <div className="text-center py-2">

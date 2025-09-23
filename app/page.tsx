@@ -132,6 +132,15 @@ export default function DashboardPage() {
               <Globe className="h-4 w-4 mr-2" />
               Dati Provinciali
             </button>
+            <a 
+              href="https://pro.lastello.it/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="rounded-full px-3 py-2 text-sm font-medium hover:bg-white/70 bg-white text-blue-600 shadow-md inline-flex items-center transition-all duration-200 hover:scale-105"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              Lastello
+            </a>
             <TabsTrigger value="marketing" disabled title="presto in arrivo" className="rounded-full opacity-60 cursor-not-allowed">
               <Activity className="h-4 w-4 mr-2" />
               Marketing

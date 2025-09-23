@@ -14,6 +14,7 @@ import { TrendEvolutionChart } from '@/components/dashboard/trend-evolution-char
 import { DeathsVariationChart } from '@/components/dashboard/deaths-variation-chart';
 import { ProvinceChart } from '@/components/dashboard/province-chart';
 import { FeedbackSystem } from '@/components/feedback-system';
+import { NewsletterSignup } from '@/components/newsletter-signup';
 import { TrendingUp, Users, Euro, Building2, Activity, BarChart3, Globe, Sparkles, X } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -350,6 +351,9 @@ export default function DashboardPage() {
         
         {/* Feedback System */}
         <FeedbackSystem />
+        
+        {/* Newsletter System */}
+        <NewsletterSignup />
       </div>
     </div>
   );

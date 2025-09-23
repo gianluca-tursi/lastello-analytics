@@ -20,7 +20,8 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const [trendType, setTrendType] = useState<'Crescente' | 'Moderato' | 'Decrescente'>('Crescente');
-  const [showViewportTip, setShowViewportTip] = useState(true);
+  const [showViewportTip, setShowViewportTip] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   const handleGoToProvinces = () => {
     const el = document.getElementById('province-section');
@@ -34,12 +35,38 @@ export default function DashboardPage() {
     // Set trend type to 'Crescente' for September (High)
     setTrendType('Crescente');
     
+    // Check if device is mobile
+    const checkMobile = () => {
+      const isMobileDevice = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isMobileDevice);
+      if (isMobileDevice) {
+        setShowViewportTip(true);
+      }
+    };
+    
+    checkMobile();
+    
+    // Check orientation change
+    const handleOrientationChange = () => {
+      if (isMobile && window.innerWidth > window.innerHeight) {
+        // Landscape mode on mobile - hide tip
+        setShowViewportTip(false);
+      }
+    };
+    
+    window.addEventListener('resize', checkMobile);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
     const interval = setInterval(() => {
       setCurrentTime(new Date().toLocaleString('it-IT'));
     }, 60000); // Update every minute
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, [isMobile]);
 
   if (!mounted) {
     return null; // Return null on server-side to prevent hydration mismatch
@@ -47,11 +74,11 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
-      {showViewportTip && (
+      {showViewportTip && isMobile && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-lg px-4 py-2 flex items-center gap-3">
             <span className="text-sm text-gray-700 dark:text-gray-300">
-              Per una migliore esperienza, visualizza da desktop o ruota il telefono in orizzontale per vedere meglio i grafici.
+              Per una migliore esperienza, ruota il telefono in orizzontale per vedere meglio i grafici.
             </span>
             <button
               type="button"

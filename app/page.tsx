@@ -39,7 +39,11 @@ export default function DashboardPage() {
     const checkMobile = () => {
       const isMobileDevice = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       setIsMobile(isMobileDevice);
-      if (isMobileDevice) {
+      
+      // Check if user has previously dismissed the tip
+      const hasDismissedTip = localStorage.getItem('viewport-tip-dismissed');
+      
+      if (isMobileDevice && !hasDismissedTip) {
         setShowViewportTip(true);
       }
     };
@@ -48,10 +52,12 @@ export default function DashboardPage() {
     
     // Check orientation change
     const handleOrientationChange = () => {
-      if (isMobile && window.innerWidth > window.innerHeight) {
-        // Landscape mode on mobile - hide tip
-        setShowViewportTip(false);
-      }
+      setTimeout(() => {
+        if (isMobile && window.innerWidth > window.innerHeight) {
+          // Landscape mode on mobile - hide tip
+          setShowViewportTip(false);
+        }
+      }, 100); // Small delay to ensure orientation change is complete
     };
     
     window.addEventListener('resize', checkMobile);
@@ -83,7 +89,10 @@ export default function DashboardPage() {
             <button
               type="button"
               aria-label="Chiudi suggerimento"
-              onClick={() => setShowViewportTip(false)}
+              onClick={() => {
+                setShowViewportTip(false);
+                localStorage.setItem('viewport-tip-dismissed', 'true');
+              }}
               className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
             >
               <X className="h-4 w-4 text-gray-500" />

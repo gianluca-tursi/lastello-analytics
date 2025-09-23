@@ -71,7 +71,7 @@ export function FeedbackSystem() {
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
         {/* Tooltip sempre visibile */}
         {isTooltipVisible && (
           <div className="mb-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 max-w-xs animate-in slide-in-from-bottom-2 duration-300 relative">
@@ -105,8 +105,8 @@ export function FeedbackSystem() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-3rem)]">
-      <Card className="shadow-2xl border-2 border-blue-200 bg-white dark:bg-gray-800">
+    <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] flex justify-end">
+      <Card className="shadow-2xl border-2 border-blue-200 bg-white dark:bg-gray-800 w-full">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">

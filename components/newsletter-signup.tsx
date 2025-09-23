@@ -13,24 +13,41 @@ export function NewsletterSignup() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isDismissed, setIsDismissed] = useState(false)
 
-  // Mostra il popup dopo 3 secondi se non è stato mai chiuso
+  // Mostra il popup quando l'utente scrolla oltre la metà della pagina
   useEffect(() => {
     const hasBeenDismissed = localStorage.getItem('newsletter-dismissed')
     console.log('Newsletter: hasBeenDismissed =', hasBeenDismissed)
+    
     if (!hasBeenDismissed) {
-      console.log('Newsletter: Setting timer for 3 seconds')
-      const timer = setTimeout(() => {
-        console.log('Newsletter: Timer fired, showing popup')
-        setIsVisible(true)
-      }, 3000)
+      const handleScroll = () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+        const windowHeight = window.innerHeight
+        const documentHeight = document.documentElement.scrollHeight
+        const scrollPercent = (scrollTop + windowHeight) / documentHeight
+        
+        console.log('Newsletter: Scroll percent =', Math.round(scrollPercent * 100) + '%')
+        
+        if (scrollPercent > 0.5 && !isVisible) {
+          console.log('Newsletter: User scrolled past 50%, showing popup')
+          setIsVisible(true)
+          // Rimuovi il listener dopo aver mostrato il popup
+          window.removeEventListener('scroll', handleScroll)
+        }
+      }
+
+      // Aggiungi il listener per lo scroll
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      
+      // Verifica subito se è già oltre la metà (per casi in cui la pagina è già scrollata)
+      handleScroll()
+      
       return () => {
-        console.log('Newsletter: Cleaning up timer')
-        clearTimeout(timer)
+        window.removeEventListener('scroll', handleScroll)
       }
     } else {
       console.log('Newsletter: Popup was dismissed, not showing')
     }
-  }, [])
+  }, [isVisible])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -124,16 +141,6 @@ export function NewsletterSignup() {
     console.log('Newsletter: Popup dismissed and saved to localStorage')
   }
 
-  // Funzione per resettare il popup (solo per debug)
-  const resetPopup = () => {
-    localStorage.removeItem('newsletter-dismissed')
-    setIsDismissed(false)
-    setIsVisible(false)
-    console.log('Newsletter: Popup reset, will show again after 3 seconds')
-    setTimeout(() => {
-      setIsVisible(true)
-    }, 3000)
-  }
 
   if (!isVisible || isDismissed) {
     return null

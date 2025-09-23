@@ -212,7 +212,7 @@ export default function DashboardPage() {
                       <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border-l-4 border-orange-400">
                         <h4 className="font-semibold text-orange-900 dark:text-orange-100 text-sm mb-1">Settembre in rialzo</h4>
                         <p className="text-xs text-orange-700 dark:text-orange-300">
-                          I preventivi indicano un possibile aumento della mortalità: il mese è stimato NORMALE/ALTO rispetto alla mediana storica, che rimane però tra i mesi più bassi.
+                          I preventivi indicano un possibile aumento della mortalità: il mese è stimato NORMALE/ALTO rispetto alla mediana storica, che rimane però tra i mesi più bassi dell'anno.
                         </p>
                       </div>
                       

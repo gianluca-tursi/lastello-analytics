@@ -240,11 +240,8 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
                     Vuoi informazioni su Lastello.it?
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
-                    L'agenzia di marketing specializzata per i servizi Funebri
                   </div>
                   <div className="mt-3 flex items-center gap-2 text-green-600 dark:text-green-400">
                     <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -255,26 +252,6 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              {/* Tasso Cremazione - spostata in ultima posizione */}
-              <Card className="modern-card hover-lift group animation-delay-800">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Tasso Cremazione
-                  </CardTitle>
-                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg group-hover:scale-110 transition-transform">
-                    <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
-                    44.2%
-                  </div>
-                  <div className="flex items-center gap-1 mt-2">
-                    <span className="text-xs font-medium text-green-600 dark:text-green-400">+2.1%</span>
-                    <span className="text-xs text-muted-foreground">rispetto all'anno scorso</span>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
 
             {/* Charts Section */}

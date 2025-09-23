@@ -194,7 +194,7 @@ export function Overview() {
             fontSize={11}
             tickLine={false}
             axisLine={false}
-            interval={0}
+            interval={typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 0}
           />
           <YAxis 
             stroke="#6b7280"

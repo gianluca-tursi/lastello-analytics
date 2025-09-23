@@ -16,11 +16,19 @@ export function NewsletterSignup() {
   // Mostra il popup dopo 3 secondi se non è stato mai chiuso
   useEffect(() => {
     const hasBeenDismissed = localStorage.getItem('newsletter-dismissed')
+    console.log('Newsletter: hasBeenDismissed =', hasBeenDismissed)
     if (!hasBeenDismissed) {
+      console.log('Newsletter: Setting timer for 3 seconds')
       const timer = setTimeout(() => {
+        console.log('Newsletter: Timer fired, showing popup')
         setIsVisible(true)
       }, 3000)
-      return () => clearTimeout(timer)
+      return () => {
+        console.log('Newsletter: Cleaning up timer')
+        clearTimeout(timer)
+      }
+    } else {
+      console.log('Newsletter: Popup was dismissed, not showing')
     }
   }, [])
 
@@ -113,6 +121,18 @@ export function NewsletterSignup() {
     setIsVisible(false)
     // Salva che è stato chiuso per non mostrarlo più
     localStorage.setItem('newsletter-dismissed', 'true')
+    console.log('Newsletter: Popup dismissed and saved to localStorage')
+  }
+
+  // Funzione per resettare il popup (solo per debug)
+  const resetPopup = () => {
+    localStorage.removeItem('newsletter-dismissed')
+    setIsDismissed(false)
+    setIsVisible(false)
+    console.log('Newsletter: Popup reset, will show again after 3 seconds')
+    setTimeout(() => {
+      setIsVisible(true)
+    }, 3000)
   }
 
   if (!isVisible || isDismissed) {

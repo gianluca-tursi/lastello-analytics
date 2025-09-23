@@ -123,7 +123,7 @@ export default function DashboardPage() {
       <div className="container mx-auto px-4 -mt-8 pb-8">
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="glass rounded-full p-1 shadow-lg">
-            <TabsTrigger value="overview" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-md">
+            <TabsTrigger value="overview" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-md hidden">
               <BarChart3 className="h-4 w-4 mr-2" />
               Overview
             </TabsTrigger>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
                     onClick={() => window.open('https://api.whatsapp.com/send?phone=393517610950&text=salve-alessandro&source=&data=', '_blank')}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Contatta Alessandro
+                    Vuoi informazioni su Lastello.it?
                   </CardTitle>
                   <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg group-hover:scale-110 transition-transform">
                     <svg className="h-4 w-4 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 24 24">
@@ -239,9 +239,6 @@ export default function DashboardPage() {
                         Marketing Specialist
                       </div>
                     </div>
-                  </div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">
-                    Vuoi informazioni su Lastello.it?
                   </div>
                   <div className="mt-3 flex items-center gap-2 text-green-600 dark:text-green-400">
                     <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -268,7 +265,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
               
-              <div className="col-span-4 space-y-6">
+              <div className="col-span-12 lg:col-span-4 space-y-6">
                 <Card className="modern-card">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">

@@ -22,7 +22,7 @@ export function FeedbackSystem() {
     { emoji: '🤩', value: 5, label: 'Eccellente' }
   ];
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!rating) {
       alert('Per favore, seleziona una valutazione');
       return;
@@ -33,11 +33,8 @@ export function FeedbackSystem() {
     try {
       const selectedEmoji = emojis.find(e => e.value === rating);
       
-      // Salva il feedback nel localStorage
-      const feedback = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        date: new Date().toLocaleDateString('it-IT'),
+      // Prepara i dati per il salvataggio
+      const feedbackData = {
         rating,
         emoji: selectedEmoji?.emoji,
         label: selectedEmoji?.label,
@@ -46,12 +43,39 @@ export function FeedbackSystem() {
         url: window.location.href,
       };
 
-      // Recupera i feedback esistenti
+      // Salva nel localStorage (backup locale)
+      const localStorageFeedback = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleDateString('it-IT'),
+        ...feedbackData
+      };
+
       const existingFeedback = JSON.parse(localStorage.getItem('dashboard-feedback') || '[]');
-      existingFeedback.push(feedback);
-      
-      // Salva nel localStorage
+      existingFeedback.push(localStorageFeedback);
       localStorage.setItem('dashboard-feedback', JSON.stringify(existingFeedback));
+
+      // Salva sul server
+      try {
+        const response = await fetch('/api/save-data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'feedback',
+            data: feedbackData
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Errore nel salvataggio sul server');
+        }
+
+        console.log('Feedback salvato sul server');
+      } catch (serverError) {
+        console.warn('Errore salvataggio server, ma localStorage funziona:', serverError);
+      }
 
       setIsSubmitted(true);
       setTimeout(() => {

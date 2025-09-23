@@ -35,25 +35,21 @@ export function NewsletterSignup() {
     setIsSubmitting(true)
 
     try {
-      // Salva l'iscrizione nel localStorage
-      const subscription = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        date: new Date().toLocaleDateString('it-IT'),
+      // Prepara i dati per il salvataggio
+      const subscriptionData = {
         email: email.trim().toLowerCase(),
         userAgent: navigator.userAgent,
         url: window.location.href,
         source: 'newsletter_popup'
       }
 
-      // Recupera le iscrizioni esistenti
+      // Controlla se l'email esiste già nel localStorage
       const existingSubscriptions = JSON.parse(
         localStorage.getItem('dashboard-newsletter') || '[]'
       )
       
-      // Controlla se l'email esiste già
       const emailExists = existingSubscriptions.some(
-        (sub: any) => sub.email === subscription.email
+        (sub: any) => sub.email === subscriptionData.email
       )
       
       if (emailExists) {
@@ -62,10 +58,38 @@ export function NewsletterSignup() {
         return
       }
 
-      existingSubscriptions.push(subscription)
-      
-      // Salva nel localStorage
+      // Salva nel localStorage (backup locale)
+      const localStorageSubscription = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleDateString('it-IT'),
+        ...subscriptionData
+      }
+
+      existingSubscriptions.push(localStorageSubscription)
       localStorage.setItem('dashboard-newsletter', JSON.stringify(existingSubscriptions))
+
+      // Salva sul server
+      try {
+        const response = await fetch('/api/save-data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'newsletter',
+            data: subscriptionData
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Errore nel salvataggio sul server')
+        }
+
+        console.log('Iscrizione newsletter salvata sul server')
+      } catch (serverError) {
+        console.warn('Errore salvataggio server, ma localStorage funziona:', serverError)
+      }
 
       setIsSubmitted(true)
       

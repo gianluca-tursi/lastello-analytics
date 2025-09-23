@@ -25,16 +25,41 @@ function FeedbackContent() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    try {
-      const storedFeedbacks = localStorage.getItem('dashboard-feedback')
-      if (storedFeedbacks) {
-        setFeedbacks(JSON.parse(storedFeedbacks))
+    const loadFeedback = async () => {
+      try {
+        // Prova prima a caricare dal server
+        const response = await fetch('/api/save-data?type=feedback')
+        if (response.ok) {
+          const result = await response.json()
+          if (result.success && result.data.length > 0) {
+            setFeedbacks(result.data)
+            setIsLoading(false)
+            return
+          }
+        }
+        
+        // Fallback: carica dal localStorage
+        const storedFeedbacks = localStorage.getItem('dashboard-feedback')
+        if (storedFeedbacks) {
+          setFeedbacks(JSON.parse(storedFeedbacks))
+        }
+      } catch (error) {
+        console.error('Errore nel caricamento dei feedback:', error)
+        // Fallback: carica dal localStorage
+        try {
+          const storedFeedbacks = localStorage.getItem('dashboard-feedback')
+          if (storedFeedbacks) {
+            setFeedbacks(JSON.parse(storedFeedbacks))
+          }
+        } catch (localError) {
+          console.error('Errore nel caricamento dal localStorage:', localError)
+        }
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      console.error('Errore nel caricamento dei feedback:', error)
-    } finally {
-      setIsLoading(false)
     }
+
+    loadFeedback()
   }, [])
 
   const downloadCSV = () => {

@@ -23,16 +23,41 @@ function NewsletterContent() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    try {
-      const storedSubscriptions = localStorage.getItem('dashboard-newsletter')
-      if (storedSubscriptions) {
-        setSubscriptions(JSON.parse(storedSubscriptions))
+    const loadSubscriptions = async () => {
+      try {
+        // Prova prima a caricare dal server
+        const response = await fetch('/api/save-data?type=newsletter')
+        if (response.ok) {
+          const result = await response.json()
+          if (result.success && result.data.length > 0) {
+            setSubscriptions(result.data)
+            setIsLoading(false)
+            return
+          }
+        }
+        
+        // Fallback: carica dal localStorage
+        const storedSubscriptions = localStorage.getItem('dashboard-newsletter')
+        if (storedSubscriptions) {
+          setSubscriptions(JSON.parse(storedSubscriptions))
+        }
+      } catch (error) {
+        console.error('Errore nel caricamento delle iscrizioni:', error)
+        // Fallback: carica dal localStorage
+        try {
+          const storedSubscriptions = localStorage.getItem('dashboard-newsletter')
+          if (storedSubscriptions) {
+            setSubscriptions(JSON.parse(storedSubscriptions))
+          }
+        } catch (localError) {
+          console.error('Errore nel caricamento dal localStorage:', localError)
+        }
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      console.error('Errore nel caricamento delle iscrizioni:', error)
-    } finally {
-      setIsLoading(false)
     }
+
+    loadSubscriptions()
   }, [])
 
   const downloadCSV = () => {

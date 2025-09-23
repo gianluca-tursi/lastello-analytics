@@ -143,12 +143,6 @@ export function NewsletterSignup() {
     console.log('Newsletter: Popup maximized')
   }
 
-  const handleDismiss = () => {
-    setIsVisible(false)
-    // Salva che è stato chiuso definitivamente per non mostrarlo più
-    localStorage.setItem('newsletter-dismissed', 'true')
-    console.log('Newsletter: Popup dismissed permanently')
-  }
 
 
   if (!isVisible) {
@@ -160,42 +154,23 @@ export function NewsletterSignup() {
       <Card className="shadow-2xl border-2 border-blue-200 bg-white dark:bg-gray-800">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Bell className="h-5 w-5 text-blue-500" />
+            <CardTitle className={`flex items-center gap-2 ${isMinimized ? 'text-sm' : 'text-lg'}`}>
+              <Bell className={`text-blue-500 ${isMinimized ? 'h-4 w-4' : 'h-5 w-5'}`} />
               Aggiornamenti Mensili
             </CardTitle>
-            <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={isMinimized ? handleMaximize : handleMinimize}
+              className="h-8 w-8 p-0"
+              title={isMinimized ? "Espandi" : "Minimizza"}
+            >
               {isMinimized ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleMaximize}
-                  className="h-8 w-8 p-0"
-                  title="Espandi"
-                >
-                  <ChevronUp className="h-4 w-4" />
-                </Button>
+                <ChevronUp className="h-4 w-4" />
               ) : (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleMinimize}
-                  className="h-8 w-8 p-0"
-                  title="Minimizza"
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleDismiss}
-                className="h-8 w-8 p-0"
-                title="Chiudi definitivamente"
-              >
                 <X className="h-4 w-4" />
-              </Button>
-            </div>
+              )}
+            </Button>
           </div>
         </CardHeader>
         

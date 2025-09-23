@@ -158,7 +158,7 @@ export default function DashboardPage() {
                       ↗
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      sopra il trend storico, ma settembre mese con bassa stagionalità
+                      Settembre sopra il trend storico, pur restando un mese di bassa stagionalità
                     </span>
                   </div>
                 </CardContent>

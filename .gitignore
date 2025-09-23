@@ -1,0 +1,24 @@
+# Dependencies
+node_modules
+
+# Next.js
+.next
+out
+
+# Build output
+dist
+
+# Env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+
+# Data (runtime)
+data/feedback.json

@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Fresh Blue & White Color Palette */
+    --background: 0 0% 100%;
+    --foreground: 221 39% 11%;
+    
+    /* Card with subtle blue tint */
+    --card: 210 40% 99%;
+    --card-foreground: 221 39% 11%;
+    
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 39% 11%;
+    
+    /* Primary Blue */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary Light Blue */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 221 39% 11%;
+    
+    /* Muted */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    
+    /* Accent - Vibrant Blue */
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+    
+    /* Destructive - Soft Red */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & Inputs */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+    
+    /* Chart Colors - Blue Gradient */
+    --chart-1: 217 91% 60%;
+    --chart-2: 199 89% 48%;
+    --chart-3: 174 77% 41%;
+    --chart-4: 202 83% 41%;
+    --chart-5: 189 75% 75%;
+    
+    --radius: 0.75rem;
+  }
+  
+  .dark {
+    /* Dark mode with deep blue tones */
+    --background: 222 47% 11%;
+    --foreground: 213 31% 91%;
+    
+    --card: 224 47% 14%;
+    --card-foreground: 213 31% 91%;
+    
+    --popover: 224 47% 14%;
+    --popover-foreground: 213 31% 91%;
+    
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+    
+    --secondary: 222 47% 20%;
+    --secondary-foreground: 213 31% 91%;
+    
+    --muted: 223 47% 20%;
+    --muted-foreground: 215 20% 65%;
+    
+    --accent: 199 89% 48%;
+    --accent-foreground: 222 47% 11%;
+    
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 222 47% 20%;
+    --input: 222 47% 20%;
+    --ring: 217 91% 60%;
+    
+    --chart-1: 217 91% 60%;
+    --chart-2: 199 89% 48%;
+    --chart-3: 174 77% 41%;
+    --chart-4: 202 83% 41%;
+    --chart-5: 189 75% 75%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Smooth transitions */
+  * {
+    @apply transition-colors duration-200;
+  }
+}
+
+@layer components {
+  /* Glass morphism effect */
+  .glass {
+    @apply backdrop-blur-xl bg-white/70 dark:bg-gray-900/70 border border-white/20 dark:border-gray-700/20;
+  }
+  
+  /* Gradient backgrounds */
+  .gradient-blue {
+    @apply bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600;
+  }
+  
+  .gradient-light {
+    @apply bg-gradient-to-br from-blue-50 via-white to-blue-50;
+  }
+  
+  /* Animated gradient */
+  .animated-gradient {
+    background: linear-gradient(-45deg, #3b82f6, #60a5fa, #0ea5e9, #06b6d4);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+  }
+  
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+  }
+  
+  /* Glow effect */
+  .glow {
+    @apply shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 transition-shadow duration-300;
+  }
+  
+  /* Modern card */
+  .modern-card {
+    @apply bg-white dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-xl shadow-sm hover:shadow-md transition-all duration-300;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-blue-400 dark:bg-blue-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-blue-500 dark:bg-blue-500;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Stagger animation delays */
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animation-delay-600 {
+  animation-delay: 600ms;
+}

@@ -189,6 +189,41 @@ export function Overview() {
     return 'ALTO';
   };
 
+  // Funzione per calcolare la stima completa (stessa logica di getClassification)
+  const getStimaCompleta = (preventivi: number, monthIndex: number) => {
+    // Baseline storica 2019-2024 (P25, P50, P75)
+    const baseline = {
+      P25: [66127, 56743, 57279, 52329, 50882, 48190, 52142, 52297, 48420, 51839, 54337, 60910],
+      P50: [66896, 59077, 60269, 55092, 51812, 50114, 53702, 54847, 49830, 54288, 54786, 65468],
+      P75: [72424, 59996, 66866, 61857, 54211, 51985, 54477, 56433, 50974, 54839, 56353, 67361]
+    };
+
+    // Calibra baseline 2025 (usando giugno come riferimento)
+    const giugno2025 = 49294; // Dato reale giugno 2025
+    const giugnoBaseline = baseline.P50[5]; // Giugno baseline
+    const scale = giugno2025 / giugnoBaseline;
+    
+    const baseline2025 = baseline.P50.map(p50 => p50 * scale);
+    
+    // Normalizza preventivi parziali (se siamo a metà mese)
+    const giorniTrascorsi = new Date().getDate();
+    const giorniTotali = new Date(new Date().getFullYear(), monthIndex + 1, 0).getDate();
+    const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
+    
+    // Elasticità e shrinkage
+    const P_giu = 246; // Preventivi giugno 2025 (dato reale)
+    const ratio = preventiviNormalizzati / P_giu;
+    const e = 0.8; // Elasticità
+    const N0 = 1000; // Shrinkage parameter
+    
+    // Stima finale
+    const D_raw = baseline2025[monthIndex] * Math.pow(ratio, e);
+    const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
+    const stima = w * D_raw + (1 - w) * baseline2025[monthIndex];
+    
+    return Math.round(stima);
+  };
+
   // Aggiorna i dati del grafico basandosi sulla configurazione
   const getUpdatedData = () => {
     const currentMonthIndex = new Date().getMonth(); // 0-11
@@ -197,10 +232,11 @@ export function Overview() {
       // Se è settembre (8) o ottobre (9) o mese corrente, aggiorna con i dati della configurazione
       if (index === 8 || index === 9 || index === currentMonthIndex) {
         const classificazione = getClassification(config.preventiviMeseCorrente, index);
+        const stimaCompleta = getStimaCompleta(config.preventiviMeseCorrente, index);
         return {
           ...item,
           reali2025: null, // Non più dati reali
-          stime2025: config.preventiviMeseCorrente * 200, // Conversione preventivi -> decessi stimati
+          stime2025: stimaCompleta, // Stima calcolata con metodologia avanzata
           classificazione: classificazione
         };
       }

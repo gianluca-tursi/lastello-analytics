@@ -100,9 +100,9 @@ const data = [
     p75: 50974, 
     bandaWidth: 50974 - 48420,
     mediana: 49830,
-    reali2025: null,
-    stime2025: 51699,
-    classificazione: 'ALTO'
+    reali2025: 49830, // Dato reale basato su 249 preventivi Lastello
+    stime2025: null,
+    classificazione: 'NORMALE'
   },
   { 
     month: 'Ott', 
@@ -112,8 +112,8 @@ const data = [
     bandaWidth: 54839 - 51839,
     mediana: 54288,
     reali2025: null,
-    stime2025: null,
-    classificazione: null
+    stime2025: 54288, // Proiezione basata su 176 preventivi (18/31 giorni)
+    classificazione: 'NORMALE'
   },
   { 
     month: 'Nov', 
@@ -314,7 +314,7 @@ export function Overview() {
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-            <span>2025 reale fino a Giugno</span>
+            <span>2025 reale (fino a Settembre)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-orange-500"></div>

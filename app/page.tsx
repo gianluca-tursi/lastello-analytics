@@ -153,7 +153,7 @@ export default function DashboardPage() {
               <Card className="modern-card hover-lift group">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Trend Richieste Settembre
+                    Preventivi Ottobre 2024
                   </CardTitle>
                   <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg group-hover:scale-110 transition-transform">
                     <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -161,14 +161,14 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-                    Normale/Alto
+                    176
                   </div>
                   <div className="flex items-center gap-1 mt-2">
                     <span className="text-xs font-medium text-green-600 dark:text-green-400">
                       ↗
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      Settembre sopra il trend storico, pur restando un mese di bassa stagionalità
+                      Al 18 ottobre 2024 - Trend in crescita rispetto ai mesi precedenti
                     </span>
                   </div>
                 </CardContent>

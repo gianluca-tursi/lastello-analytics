@@ -143,19 +143,51 @@ const data = [
 export function Overview() {
   const { config } = useConfig();
 
+  // Funzione per calcolare la classificazione basata sui preventivi
+  const getClassification = (preventivi: number, monthIndex: number) => {
+    // Mediane storiche per mese (basate sui dati del termometro)
+    const medianeStoriche = [
+      66896, // Gennaio
+      59077, // Febbraio  
+      60269, // Marzo
+      55092, // Aprile
+      51812, // Maggio
+      50114, // Giugno
+      53702, // Luglio
+      54847, // Agosto
+      49830, // Settembre
+      54288, // Ottobre
+      54786, // Novembre
+      65468  // Dicembre
+    ];
+
+    const medianaCorrente = medianeStoriche[monthIndex];
+    
+    // Conversione preventivi -> decessi stimati (formula: preventivi × 200)
+    const decessiStimati = preventivi * 200;
+    
+    // Calcolo percentuale rispetto alla mediana
+    const percentuale = (decessiStimati / medianaCorrente) * 100;
+    
+    // Classificazione basata su percentuale
+    if (percentuale >= 105) return 'ALTO';
+    if (percentuale <= 95) return 'BASSO';
+    return 'NORMALE';
+  };
+
   // Aggiorna i dati del grafico basandosi sulla configurazione
   const getUpdatedData = () => {
     const currentMonthIndex = new Date().getMonth(); // 0-11
-    const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
     
     return data.map((item, index) => {
       // Se è il mese corrente, aggiorna con i dati della configurazione
       if (index === currentMonthIndex) {
+        const classificazione = getClassification(config.preventiviMeseCorrente, index);
         return {
           ...item,
           reali2025: config.preventiviMeseCorrente * 200, // Conversione preventivi -> decessi stimati
           stime2025: null,
-          classificazione: 'NORMALE'
+          classificazione: classificazione
         };
       }
       return item;

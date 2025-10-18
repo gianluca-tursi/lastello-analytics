@@ -134,6 +134,40 @@ export default function AdminPage() {
     return months[new Date().getMonth()]
   }
 
+  // Funzione per calcolare la classificazione basata sui preventivi
+  const getClassification = (preventivi: number) => {
+    const currentMonth = new Date().getMonth();
+    
+    // Mediane storiche per mese (basate sui dati del termometro)
+    const medianeStoriche = [
+      66896, // Gennaio
+      59077, // Febbraio  
+      60269, // Marzo
+      55092, // Aprile
+      51812, // Maggio
+      50114, // Giugno
+      53702, // Luglio
+      54847, // Agosto
+      49830, // Settembre
+      54288, // Ottobre
+      54786, // Novembre
+      65468  // Dicembre
+    ];
+
+    const medianaCorrente = medianeStoriche[currentMonth];
+    
+    // Conversione preventivi -> decessi stimati (formula: preventivi × 200)
+    const decessiStimati = preventivi * 200;
+    
+    // Calcolo percentuale rispetto alla mediana
+    const percentuale = (decessiStimati / medianaCorrente) * 100;
+    
+    // Classificazione basata su percentuale
+    if (percentuale >= 105) return 'Alto';
+    if (percentuale <= 95) return 'Basso';
+    return 'Normale';
+  };
+
   const updateCurrentMonth = () => {
     setConfig(prev => ({
       ...prev,
@@ -256,7 +290,7 @@ export default function AdminPage() {
                         </CardHeader>
                         <CardContent>
                           <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-                            {config.preventiviMeseCorrente}
+                            {getClassification(config.preventiviMeseCorrente)}
                           </div>
                           <div className="flex items-center gap-1 mt-2">
                             <span className="text-xs font-medium text-green-600 dark:text-green-400">

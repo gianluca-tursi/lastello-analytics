@@ -23,6 +23,40 @@ export default function DashboardPage() {
   const [currentTime, setCurrentTime] = useState('');
   const [trendType, setTrendType] = useState<'Crescente' | 'Moderato' | 'Decrescente'>('Crescente');
   const { config, isLoading: configLoading } = useConfig();
+
+  // Funzione per calcolare la classificazione basata sui preventivi
+  const getClassification = (preventivi: number) => {
+    const currentMonth = new Date().getMonth();
+    
+    // Mediane storiche per mese (basate sui dati del termometro)
+    const medianeStoriche = [
+      66896, // Gennaio
+      59077, // Febbraio  
+      60269, // Marzo
+      55092, // Aprile
+      51812, // Maggio
+      50114, // Giugno
+      53702, // Luglio
+      54847, // Agosto
+      49830, // Settembre
+      54288, // Ottobre
+      54786, // Novembre
+      65468  // Dicembre
+    ];
+
+    const medianaCorrente = medianeStoriche[currentMonth];
+    
+    // Conversione preventivi -> decessi stimati (formula: preventivi × 200)
+    const decessiStimati = preventivi * 200;
+    
+    // Calcolo percentuale rispetto alla mediana
+    const percentuale = (decessiStimati / medianaCorrente) * 100;
+    
+    // Classificazione basata su percentuale
+    if (percentuale >= 105) return 'Alto';
+    if (percentuale <= 95) return 'Basso';
+    return 'Normale';
+  };
   const [showViewportTip, setShowViewportTip] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   
@@ -163,7 +197,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-                    {configLoading ? '...' : config.preventiviMeseCorrente}
+                    {configLoading ? '...' : getClassification(config.preventiviMeseCorrente)}
                   </div>
                   <div className="flex items-center gap-1 mt-2">
                     <span className="text-xs font-medium text-green-600 dark:text-green-400">
@@ -292,7 +326,7 @@ export default function DashboardPage() {
                       </div>
                       
                       <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border-l-4 border-orange-400">
-                        <h4 className="font-semibold text-orange-900 dark:text-orange-100 text-sm mb-1">{config.meseCorrente} Normale</h4>
+                        <h4 className="font-semibold text-orange-900 dark:text-orange-100 text-sm mb-1">{config.meseCorrente} {getClassification(config.preventiviMeseCorrente)}</h4>
                         <p className="text-xs text-orange-700 dark:text-orange-300">
                           I preventivi indicano un tasso di mortalità in linea con il periodo storico: il mese è stimato NORMALE rispetto alla mediana storica, mese in rialzo verso i picchi di novembre e dicembre.
                         </p>

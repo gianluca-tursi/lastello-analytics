@@ -183,7 +183,19 @@ export default function AdminPage() {
       stima = baseline2025[currentMonth] * ratio * 2; // Stima più conservativa
     }
     
-    console.log(`Debug stima completa: preventivi=${preventivi}, preventiviNormalizzati=${preventiviNormalizzati}, ratio=${ratio}, D_raw=${D_raw}, w=${w}, stima=${stima}`);
+    // Correzione per valori intermedi (0.1 < ratio < 0.5) - riduci shrinkage
+    if (ratio >= 0.1 && ratio < 0.5) {
+      const w_corretto = Math.min(w * 3, 0.8); // Aumenta il peso di D_raw
+      stima = w_corretto * D_raw + (1 - w_corretto) * baseline2025[currentMonth];
+    }
+    
+    // Correzione per valori intermedi (0.1 < ratio < 0.5) - riduci shrinkage
+    if (ratio >= 0.1 && ratio < 0.5) {
+      const w_corretto = Math.min(w * 3, 0.8); // Aumenta il peso di D_raw
+      stima = w_corretto * D_raw + (1 - w_corretto) * baseline2025[currentMonth];
+    }
+    
+    console.log(`Debug stima completa: preventivi=${preventivi}, preventiviNormalizzati=${preventiviNormalizzati}, ratio=${ratio}, D_raw=${D_raw}, w=${w}, w_corretto=${ratio >= 0.1 && ratio < 0.5 ? Math.min(w * 3, 0.8) : w}, stima=${stima}`);
     
     return Math.round(stima);
   };
@@ -227,6 +239,12 @@ export default function AdminPage() {
     // Correzione per valori molto bassi (ratio < 0.1)
     if (ratio < 0.1) {
       stima = baseline2025[currentMonth] * ratio * 2; // Stima più conservativa
+    }
+    
+    // Correzione per valori intermedi (0.1 < ratio < 0.5) - riduci shrinkage
+    if (ratio >= 0.1 && ratio < 0.5) {
+      const w_corretto = Math.min(w * 3, 0.8); // Aumenta il peso di D_raw
+      stima = w_corretto * D_raw + (1 - w_corretto) * baseline2025[currentMonth];
     }
     
     // Classificazione a 5 livelli basata su quantili

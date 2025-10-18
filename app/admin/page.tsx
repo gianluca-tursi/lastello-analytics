@@ -183,6 +183,8 @@ export default function AdminPage() {
       stima = baseline2025[currentMonth] * ratio * 2; // Stima più conservativa
     }
     
+    console.log(`Debug stima completa: preventivi=${preventivi}, preventiviNormalizzati=${preventiviNormalizzati}, ratio=${ratio}, D_raw=${D_raw}, w=${w}, stima=${stima}`);
+    
     return Math.round(stima);
   };
 

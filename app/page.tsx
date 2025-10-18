@@ -48,7 +48,7 @@ export default function DashboardPage() {
     const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
     
     // Elasticità e shrinkage
-    const P_giu = 49294; // Preventivi giugno 2025 (dato reale)
+    const P_giu = 246; // Preventivi giugno 2025 (dato reale)
     const ratio = preventiviNormalizzati / P_giu;
     const e = 0.8; // Elasticità
     const N0 = 1000; // Shrinkage parameter

@@ -183,15 +183,17 @@ export default function AdminPage() {
       stima = baseline2025[currentMonth] * ratio * 2; // Stima più conservativa
     }
     
-    // Correzione per valori intermedi (0.1 < ratio < 0.5) - riduci shrinkage
+    // Correzione per valori intermedi (0.1 < ratio < 0.5) - bilancia shrinkage
     if (ratio >= 0.1 && ratio < 0.5) {
-      const w_corretto = Math.min(w * 3, 0.8); // Aumenta il peso di D_raw
+      // Usa una correzione più graduale che mantiene la progressione
+      const w_corretto = Math.min(w * 2, 0.6); // Correzione più moderata
       stima = w_corretto * D_raw + (1 - w_corretto) * baseline2025[currentMonth];
     }
     
-    // Correzione per valori intermedi (0.1 < ratio < 0.5) - riduci shrinkage
+    // Correzione per valori intermedi (0.1 < ratio < 0.5) - bilancia shrinkage
     if (ratio >= 0.1 && ratio < 0.5) {
-      const w_corretto = Math.min(w * 3, 0.8); // Aumenta il peso di D_raw
+      // Usa una correzione più graduale che mantiene la progressione
+      const w_corretto = Math.min(w * 2, 0.6); // Correzione più moderata
       stima = w_corretto * D_raw + (1 - w_corretto) * baseline2025[currentMonth];
     }
     
@@ -241,9 +243,10 @@ export default function AdminPage() {
       stima = baseline2025[currentMonth] * ratio * 2; // Stima più conservativa
     }
     
-    // Correzione per valori intermedi (0.1 < ratio < 0.5) - riduci shrinkage
+    // Correzione per valori intermedi (0.1 < ratio < 0.5) - bilancia shrinkage
     if (ratio >= 0.1 && ratio < 0.5) {
-      const w_corretto = Math.min(w * 3, 0.8); // Aumenta il peso di D_raw
+      // Usa una correzione più graduale che mantiene la progressione
+      const w_corretto = Math.min(w * 2, 0.6); // Correzione più moderata
       stima = w_corretto * D_raw + (1 - w_corretto) * baseline2025[currentMonth];
     }
     

@@ -7,31 +7,16 @@ const CONFIG_FILE = path.join(process.cwd(), 'data', 'config.json')
 // GET - Leggi configurazione
 export async function GET() {
   try {
-    // Verifica se il file esiste
-    try {
-      await fs.access(CONFIG_FILE)
-    } catch {
-      // Se non esiste, crea una configurazione di default
-      const defaultConfig = {
-        preventiviMeseCorrente: 176,
-        meseCorrente: 'Ottobre',
-        ultimoAggiornamento: new Date().toLocaleString('it-IT')
-      }
-      
-      // Crea la directory se non esiste
-      await fs.mkdir(path.dirname(CONFIG_FILE), { recursive: true })
-      
-      // Salva la configurazione di default
-      await fs.writeFile(CONFIG_FILE, JSON.stringify(defaultConfig, null, 2))
-      
-      return NextResponse.json(defaultConfig)
+    // Su Netlify, restituiamo sempre una configurazione di default
+    // perché non possiamo leggere/scrivere file durante il runtime
+    const defaultConfig = {
+      preventiviMeseCorrente: 176,
+      meseCorrente: 'Ottobre',
+      ultimoAggiornamento: new Date().toLocaleString('it-IT')
     }
-
-    // Leggi il file di configurazione
-    const configData = await fs.readFile(CONFIG_FILE, 'utf-8')
-    const config = JSON.parse(configData)
     
-    return NextResponse.json(config)
+    console.log('Restituendo configurazione di default per Netlify:', defaultConfig)
+    return NextResponse.json(defaultConfig)
   } catch (error) {
     console.error('Errore lettura configurazione:', error)
     return NextResponse.json(

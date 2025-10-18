@@ -342,7 +342,15 @@ export default function DashboardPage() {
                       <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border-l-4 border-orange-400">
                         <h4 className="font-semibold text-orange-900 dark:text-orange-100 text-sm mb-1">{config.meseCorrente} {getClassification(config.preventiviMeseCorrente)}</h4>
                         <p className="text-xs text-orange-700 dark:text-orange-300">
-                          I preventivi indicano un tasso di mortalità in linea con il periodo storico: il mese è stimato NORMALE rispetto alla mediana storica, mese in rialzo verso i picchi di novembre e dicembre.
+                          {getClassification(config.preventiviMeseCorrente) === 'Basso' ? 
+                            'I preventivi indicano un tasso di mortalità inferiore al periodo storico: il mese è stimato BASSO rispetto alla mediana storica, con valori al di sotto delle aspettative.' :
+                          getClassification(config.preventiviMeseCorrente) === 'Medio Basso' ?
+                            'I preventivi indicano un tasso di mortalità leggermente inferiore al periodo storico: il mese è stimato MEDIO BASSO rispetto alla mediana storica.' :
+                          getClassification(config.preventiviMeseCorrente) === 'Normale' ?
+                            'I preventivi indicano un tasso di mortalità in linea con il periodo storico: il mese è stimato NORMALE rispetto alla mediana storica, mese in rialzo verso i picchi di novembre e dicembre.' :
+                          getClassification(config.preventiviMeseCorrente) === 'Medio Alto' ?
+                            'I preventivi indicano un tasso di mortalità superiore al periodo storico: il mese è stimato MEDIO ALTO rispetto alla mediana storica, con valori in aumento.' :
+                            'I preventivi indicano un tasso di mortalità significativamente superiore al periodo storico: il mese è stimato ALTO rispetto alla mediana storica, con valori elevati.'}
                         </p>
                       </div>
                       

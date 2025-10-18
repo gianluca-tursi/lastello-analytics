@@ -123,7 +123,7 @@ export default function AdminPage() {
       }
     } catch (error) {
       console.error('Errore salvataggio:', error)
-      setMessage(`Errore nel salvataggio della configurazione: ${error.message}`)
+      setMessage(`Errore nel salvataggio della configurazione: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`)
     } finally {
       setIsLoading(false)
     }

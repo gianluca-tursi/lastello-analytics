@@ -175,13 +175,18 @@ export function Overview() {
     const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
     const stima = w * D_raw + (1 - w) * baseline2025[monthIndex];
     
-    // Classificazione basata su P25 e P75
+    // Classificazione a 5 livelli basata su quantili
+    const P10 = baseline.P25[monthIndex] * 0.8; // Approssimazione P10
     const P25 = baseline.P25[monthIndex];
+    const P50 = baseline.P50[monthIndex];
     const P75 = baseline.P75[monthIndex];
+    const P90 = baseline.P75[monthIndex] * 1.2; // Approssimazione P90
     
-    if (stima < P25) return 'BASSO';
-    if (stima > P75) return 'ALTO';
-    return 'NORMALE';
+    if (stima < P10) return 'BASSO';
+    if (stima < P25) return 'MEDIO_BASSO';
+    if (stima < P75) return 'NORMALE';
+    if (stima < P90) return 'MEDIO_ALTO';
+    return 'ALTO';
   };
 
   // Aggiorna i dati del grafico basandosi sulla configurazione
@@ -333,9 +338,14 @@ export function Overview() {
                     fontSize="10"
                     fontWeight="bold"
                     fill={payload.classificazione === 'ALTO' ? '#dc2626' : 
-                          payload.classificazione === 'BASSO' ? '#16a34a' : '#ca8a04'}
+                          payload.classificazione === 'MEDIO_ALTO' ? '#ea580c' :
+                          payload.classificazione === 'NORMALE' ? '#ca8a04' :
+                          payload.classificazione === 'MEDIO_BASSO' ? '#22c55e' :
+                          '#16a34a'}
                   >
-                    {payload.classificazione}
+                    {payload.classificazione === 'MEDIO_BASSO' ? 'MEDIO BASSO' :
+                     payload.classificazione === 'MEDIO_ALTO' ? 'MEDIO ALTO' :
+                     payload.classificazione}
                   </text>
                   <circle
                     cx={cx}
@@ -370,9 +380,14 @@ export function Overview() {
                     fontSize="10"
                     fontWeight="bold"
                     fill={payload.classificazione === 'ALTO' ? '#dc2626' : 
-                          payload.classificazione === 'BASSO' ? '#16a34a' : '#ca8a04'}
+                          payload.classificazione === 'MEDIO_ALTO' ? '#ea580c' :
+                          payload.classificazione === 'NORMALE' ? '#ca8a04' :
+                          payload.classificazione === 'MEDIO_BASSO' ? '#22c55e' :
+                          '#16a34a'}
                   >
-                    {payload.classificazione}
+                    {payload.classificazione === 'MEDIO_BASSO' ? 'MEDIO BASSO' :
+                     payload.classificazione === 'MEDIO_ALTO' ? 'MEDIO ALTO' :
+                     payload.classificazione}
                   </text>
                   <circle
                     cx={cx}

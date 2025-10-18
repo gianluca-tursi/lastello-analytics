@@ -168,13 +168,18 @@ export default function AdminPage() {
     const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
     const stima = w * D_raw + (1 - w) * baseline2025[currentMonth];
     
-    // Classificazione basata su P25 e P75
+    // Classificazione a 5 livelli basata su quantili
+    const P10 = baseline.P25[currentMonth] * 0.8; // Approssimazione P10
     const P25 = baseline.P25[currentMonth];
+    const P50 = baseline.P50[currentMonth];
     const P75 = baseline.P75[currentMonth];
+    const P90 = baseline.P75[currentMonth] * 1.2; // Approssimazione P90
     
-    if (stima < P25) return 'Basso';
-    if (stima > P75) return 'Alto';
-    return 'Normale';
+    if (stima < P10) return 'Basso';
+    if (stima < P25) return 'Medio Basso';
+    if (stima < P75) return 'Normale';
+    if (stima < P90) return 'Medio Alto';
+    return 'Alto';
   };
 
   const updateCurrentMonth = () => {

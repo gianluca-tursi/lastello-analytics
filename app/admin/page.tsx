@@ -234,13 +234,16 @@ export default function AdminPage() {
     const P75 = baseline.P75[currentMonth];
     const P90 = baseline.P75[currentMonth] * 1.2; // Approssimazione P90
     
-    console.log(`Debug classificazione: preventivi=${preventivi}, preventiviNormalizzati=${preventiviNormalizzati}, ratio=${ratio}, stima=${stima}, P10=${P10}, P25=${P25}, P75=${P75}, P90=${P90}`);
+    let classificazione = '';
+    if (stima < P10) classificazione = 'Basso';
+    else if (stima < P25) classificazione = 'Medio Basso';
+    else if (stima < P75) classificazione = 'Normale';
+    else if (stima < P90) classificazione = 'Medio Alto';
+    else classificazione = 'Alto';
     
-    if (stima < P10) return 'Basso';
-    if (stima < P25) return 'Medio Basso';
-    if (stima < P75) return 'Normale';
-    if (stima < P90) return 'Medio Alto';
-    return 'Alto';
+    console.log(`Debug classificazione: preventivi=${preventivi}, preventiviNormalizzati=${preventiviNormalizzati}, ratio=${ratio}, stima=${stima}, P10=${P10}, P25=${P25}, P75=${P75}, P90=${P90}, RISULTATO=${classificazione}`);
+    
+    return classificazione;
   };
 
   const updateCurrentMonth = () => {

@@ -131,7 +131,7 @@ export default function AdminPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('auth-token')
-    window.location.href = '/admin'
+    window.location.href = '/'
   }
 
   const getCurrentMonth = () => {
@@ -141,6 +141,43 @@ export default function AdminPage() {
     ]
     return months[new Date().getMonth()]
   }
+
+  // Funzione per calcolare la stima completa (stessa logica del grafico)
+  const getStimaCompleta = (preventivi: number) => {
+    const currentMonth = new Date().getMonth();
+    
+    // Baseline storica 2019-2024 (P25, P50, P75)
+    const baseline = {
+      P25: [66127, 56743, 57279, 52329, 50882, 48190, 52142, 52297, 48420, 51839, 54337, 60910],
+      P50: [66896, 59077, 60269, 55092, 51812, 50114, 53702, 54847, 49830, 54288, 54786, 65468],
+      P75: [72424, 59996, 66866, 61857, 54211, 51985, 54477, 56433, 50974, 54839, 56353, 67361]
+    };
+
+    // Calibra baseline 2025 (usando giugno come riferimento)
+    const giugno2025 = 49294; // Dato reale giugno 2025
+    const giugnoBaseline = baseline.P50[5]; // Giugno baseline
+    const scale = giugno2025 / giugnoBaseline;
+    
+    const baseline2025 = baseline.P50.map(p50 => p50 * scale);
+    
+    // Normalizza preventivi parziali (se siamo a metà mese)
+    const giorniTrascorsi = new Date().getDate();
+    const giorniTotali = new Date(new Date().getFullYear(), currentMonth + 1, 0).getDate();
+    const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
+    
+    // Elasticità e shrinkage
+    const P_giu = 246; // Preventivi giugno 2025 (dato reale)
+    const ratio = preventiviNormalizzati / P_giu;
+    const e = 0.8; // Elasticità
+    const N0 = 1000; // Shrinkage parameter
+    
+    // Stima finale
+    const D_raw = baseline2025[currentMonth] * Math.pow(ratio, e);
+    const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
+    const stima = w * D_raw + (1 - w) * baseline2025[currentMonth];
+    
+    return Math.round(stima);
+  };
 
   // Funzione per calcolare la classificazione basata sui preventivi (metodologia avanzata)
   const getClassification = (preventivi: number) => {
@@ -319,13 +356,21 @@ export default function AdminPage() {
                           <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
                             {getClassification(config.preventiviMeseCorrente)}
                           </div>
-                          <div className="flex items-center gap-1 mt-2">
-                            <span className="text-xs font-medium text-green-600 dark:text-green-400">
-                              ↗
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              Ultimo aggiornamento: {config.ultimoAggiornamento}
-                            </span>
+                          <div className="mt-2 space-y-1">
+                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                              <span className="font-medium">{getStimaCompleta(config.preventiviMeseCorrente).toLocaleString()}</span> decessi stimati
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Da {config.preventiviMeseCorrente} preventivi (metodologia avanzata)
+                            </div>
+                            <div className="flex items-center gap-1 mt-2">
+                              <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                                ↗
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                Ultimo aggiornamento: {config.ultimoAggiornamento}
+                              </span>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>

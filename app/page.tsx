@@ -24,37 +24,46 @@ export default function DashboardPage() {
   const [trendType, setTrendType] = useState<'Crescente' | 'Moderato' | 'Decrescente'>('Crescente');
   const { config, isLoading: configLoading } = useConfig();
 
-  // Funzione per calcolare la classificazione basata sui preventivi
+  // Funzione per calcolare la classificazione basata sui preventivi (metodologia avanzata)
   const getClassification = (preventivi: number) => {
     const currentMonth = new Date().getMonth();
     
-    // Mediane storiche per mese (basate sui dati del termometro)
-    const medianeStoriche = [
-      66896, // Gennaio
-      59077, // Febbraio  
-      60269, // Marzo
-      55092, // Aprile
-      51812, // Maggio
-      50114, // Giugno
-      53702, // Luglio
-      54847, // Agosto
-      49830, // Settembre
-      54288, // Ottobre
-      54786, // Novembre
-      65468  // Dicembre
-    ];
+    // Baseline storica 2019-2024 (P25, P50, P75)
+    const baseline = {
+      P25: [66127, 56743, 57279, 52329, 50882, 48190, 52142, 52297, 48420, 51839, 54337, 60910],
+      P50: [66896, 59077, 60269, 55092, 51812, 50114, 53702, 54847, 49830, 54288, 54786, 65468],
+      P75: [72424, 59996, 66866, 61857, 54211, 51985, 54477, 56433, 50974, 54839, 56353, 67361]
+    };
 
-    const medianaCorrente = medianeStoriche[currentMonth];
+    // Calibra baseline 2025 (usando giugno come riferimento)
+    const giugno2025 = 49294; // Dato reale giugno 2025
+    const giugnoBaseline = baseline.P50[5]; // Giugno baseline
+    const scale = giugno2025 / giugnoBaseline;
     
-    // Conversione preventivi -> decessi stimati (formula: preventivi × 200)
-    const decessiStimati = preventivi * 200;
+    const baseline2025 = baseline.P50.map(p50 => p50 * scale);
     
-    // Calcolo percentuale rispetto alla mediana
-    const percentuale = (decessiStimati / medianaCorrente) * 100;
+    // Normalizza preventivi parziali (se siamo a metà mese)
+    const giorniTrascorsi = new Date().getDate();
+    const giorniTotali = new Date(new Date().getFullYear(), currentMonth + 1, 0).getDate();
+    const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
     
-    // Classificazione basata su percentuale
-    if (percentuale >= 105) return 'Alto';
-    if (percentuale <= 95) return 'Basso';
+    // Elasticità e shrinkage
+    const P_giu = 49294; // Preventivi giugno 2025 (dato reale)
+    const ratio = preventiviNormalizzati / P_giu;
+    const e = 0.8; // Elasticità
+    const N0 = 1000; // Shrinkage parameter
+    
+    // Stima finale
+    const D_raw = baseline2025[currentMonth] * Math.pow(ratio, e);
+    const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
+    const stima = w * D_raw + (1 - w) * baseline2025[currentMonth];
+    
+    // Classificazione basata su P25 e P75
+    const P25 = baseline.P25[currentMonth];
+    const P75 = baseline.P75[currentMonth];
+    
+    if (stima < P25) return 'Basso';
+    if (stima > P75) return 'Alto';
     return 'Normale';
   };
   const [showViewportTip, setShowViewportTip] = useState(false);

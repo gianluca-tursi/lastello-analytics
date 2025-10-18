@@ -2,6 +2,7 @@
 
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Legend, Area, AreaChart, ReferenceLine } from 'recharts';
 import React from 'react';
+import { useConfig } from '@/hooks/use-config';
 
 // Dati del Termometro mortalità - Italia (aggiornati con dati ISTAT)
 const data = [
@@ -140,6 +141,28 @@ const data = [
 ];
 
 export function Overview() {
+  const { config } = useConfig();
+
+  // Aggiorna i dati del grafico basandosi sulla configurazione
+  const getUpdatedData = () => {
+    const currentMonthIndex = new Date().getMonth(); // 0-11
+    const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+    
+    return data.map((item, index) => {
+      // Se è il mese corrente, aggiorna con i dati della configurazione
+      if (index === currentMonthIndex) {
+        return {
+          ...item,
+          reali2025: config.preventiviMeseCorrente * 200, // Conversione preventivi -> decessi stimati
+          stime2025: null,
+          classificazione: 'NORMALE'
+        };
+      }
+      return item;
+    });
+  };
+
+  const updatedData = getUpdatedData();
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -198,7 +221,7 @@ export function Overview() {
   return (
     <div>
       <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+        <LineChart data={updatedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="1 1" stroke="#e5e7eb" opacity={0.3} />
           <XAxis 
             dataKey="month" 

@@ -15,12 +15,14 @@ import { DeathsVariationChart } from '@/components/dashboard/deaths-variation-ch
 import { ProvinceChart } from '@/components/dashboard/province-chart';
 import { FeedbackSystem } from '@/components/feedback-system';
 import { NewsletterSignup } from '@/components/newsletter-signup';
+import { useConfig } from '@/hooks/use-config';
 import { TrendingUp, Users, Euro, Building2, Activity, BarChart3, Globe, Sparkles, X } from 'lucide-react';
 
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const [trendType, setTrendType] = useState<'Crescente' | 'Moderato' | 'Decrescente'>('Crescente');
+  const { config, isLoading: configLoading } = useConfig();
   const [showViewportTip, setShowViewportTip] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   
@@ -153,7 +155,7 @@ export default function DashboardPage() {
               <Card className="modern-card hover-lift group">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Trend Richieste Ottobre
+                    Trend Richieste {config.meseCorrente}
                   </CardTitle>
                   <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg group-hover:scale-110 transition-transform">
                     <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -161,7 +163,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-                    Normale
+                    {configLoading ? '...' : config.preventiviMeseCorrente}
                   </div>
                   <div className="flex items-center gap-1 mt-2">
                     <span className="text-xs font-medium text-green-600 dark:text-green-400">
@@ -290,7 +292,7 @@ export default function DashboardPage() {
                       </div>
                       
                       <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border-l-4 border-orange-400">
-                        <h4 className="font-semibold text-orange-900 dark:text-orange-100 text-sm mb-1">Ottobre Normale</h4>
+                        <h4 className="font-semibold text-orange-900 dark:text-orange-100 text-sm mb-1">{config.meseCorrente} Normale</h4>
                         <p className="text-xs text-orange-700 dark:text-orange-300">
                           I preventivi indicano un tasso di mortalità in linea con il periodo storico: il mese è stimato NORMALE rispetto alla mediana storica, mese in rialzo verso i picchi di novembre e dicembre.
                         </p>

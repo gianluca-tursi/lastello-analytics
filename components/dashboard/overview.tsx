@@ -255,7 +255,35 @@ export function Overview() {
             dataKey="reali2025"
             stroke="#3b82f6"
             strokeWidth={3}
-            dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+            dot={(props) => {
+              const { cx, cy, payload, index } = props;
+              if (!payload.reali2025) {
+                return <circle cx={cx} cy={cy} r={0} fill="transparent" />;
+              }
+              return (
+                <g key={`reale-dot-${index}`}>
+                  <text
+                    x={cx}
+                    y={cy - 15}
+                    textAnchor="middle"
+                    fontSize="10"
+                    fontWeight="bold"
+                    fill={payload.classificazione === 'ALTO' ? '#dc2626' : 
+                          payload.classificazione === 'BASSO' ? '#16a34a' : '#ca8a04'}
+                  >
+                    {payload.classificazione}
+                  </text>
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={6}
+                    fill="#3b82f6"
+                    stroke="#1d4ed8"
+                    strokeWidth={2}
+                  />
+                </g>
+              );
+            }}
             connectNulls={false}
           />
           
@@ -314,7 +342,7 @@ export function Overview() {
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-            <span>2025 reale (fino a Settembre)</span>
+            <span>2025 reale fino a giugno</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-orange-500"></div>

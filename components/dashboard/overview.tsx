@@ -194,13 +194,13 @@ export function Overview() {
     const currentMonthIndex = new Date().getMonth(); // 0-11
     
     return data.map((item, index) => {
-      // Se è il mese corrente, aggiorna con i dati della configurazione
-      if (index === currentMonthIndex) {
+      // Se è settembre (8) o ottobre (9) o mese corrente, aggiorna con i dati della configurazione
+      if (index === 8 || index === 9 || index === currentMonthIndex) {
         const classificazione = getClassification(config.preventiviMeseCorrente, index);
         return {
           ...item,
-          reali2025: config.preventiviMeseCorrente * 200, // Conversione preventivi -> decessi stimati
-          stime2025: null,
+          reali2025: null, // Non più dati reali
+          stime2025: config.preventiviMeseCorrente * 200, // Conversione preventivi -> decessi stimati
           classificazione: classificazione
         };
       }
@@ -249,10 +249,14 @@ export function Overview() {
                 {data.classificazione && (
                   <span className={`text-xs px-2 py-1 rounded ${
                     data.classificazione === 'ALTO' ? 'bg-red-100 text-red-800' :
-                    data.classificazione === 'BASSO' ? 'bg-green-100 text-green-800' :
-                    'bg-yellow-100 text-yellow-800'
+                    data.classificazione === 'MEDIO_ALTO' ? 'bg-orange-100 text-orange-800' :
+                    data.classificazione === 'NORMALE' ? 'bg-yellow-100 text-yellow-800' :
+                    data.classificazione === 'MEDIO_BASSO' ? 'bg-green-100 text-green-800' :
+                    'bg-green-100 text-green-800'
                   }`}>
-                    {data.classificazione}
+                    {data.classificazione === 'MEDIO_BASSO' ? 'MEDIO BASSO' :
+                     data.classificazione === 'MEDIO_ALTO' ? 'MEDIO ALTO' :
+                     data.classificazione}
                   </span>
                 )}
               </div>

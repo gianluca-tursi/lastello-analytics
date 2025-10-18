@@ -163,7 +163,9 @@ export default function AdminPage() {
     // Normalizza preventivi parziali (se siamo a metà mese)
     const giorniTrascorsi = new Date().getDate();
     const giorniTotali = new Date(new Date().getFullYear(), currentMonth + 1, 0).getDate();
-    const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
+    const preventiviNormalizzati = giorniTrascorsi < giorniTotali ? 
+      (preventivi / giorniTrascorsi) * giorniTotali : 
+      preventivi;
     
     // Elasticità e shrinkage
     const P_giu = 246; // Preventivi giugno 2025 (dato reale)
@@ -171,10 +173,15 @@ export default function AdminPage() {
     const e = 0.8; // Elasticità
     const N0 = 1000; // Shrinkage parameter
     
-    // Stima finale
+    // Stima finale con correzione per valori molto bassi
     const D_raw = baseline2025[currentMonth] * Math.pow(ratio, e);
     const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
-    const stima = w * D_raw + (1 - w) * baseline2025[currentMonth];
+    let stima = w * D_raw + (1 - w) * baseline2025[currentMonth];
+    
+    // Correzione per valori molto bassi (ratio < 0.1)
+    if (ratio < 0.1) {
+      stima = baseline2025[currentMonth] * ratio * 2; // Stima più conservativa
+    }
     
     return Math.round(stima);
   };
@@ -200,7 +207,9 @@ export default function AdminPage() {
     // Normalizza preventivi parziali (se siamo a metà mese)
     const giorniTrascorsi = new Date().getDate();
     const giorniTotali = new Date(new Date().getFullYear(), currentMonth + 1, 0).getDate();
-    const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
+    const preventiviNormalizzati = giorniTrascorsi < giorniTotali ? 
+      (preventivi / giorniTrascorsi) * giorniTotali : 
+      preventivi;
     
     // Elasticità e shrinkage
     const P_giu = 246; // Preventivi giugno 2025 (dato reale)
@@ -208,10 +217,15 @@ export default function AdminPage() {
     const e = 0.8; // Elasticità
     const N0 = 1000; // Shrinkage parameter
     
-    // Stima finale
+    // Stima finale con correzione per valori molto bassi
     const D_raw = baseline2025[currentMonth] * Math.pow(ratio, e);
     const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
-    const stima = w * D_raw + (1 - w) * baseline2025[currentMonth];
+    let stima = w * D_raw + (1 - w) * baseline2025[currentMonth];
+    
+    // Correzione per valori molto bassi (ratio < 0.1)
+    if (ratio < 0.1) {
+      stima = baseline2025[currentMonth] * ratio * 2; // Stima più conservativa
+    }
     
     // Classificazione a 5 livelli basata su quantili
     const P10 = baseline.P25[currentMonth] * 0.8; // Approssimazione P10
@@ -220,7 +234,7 @@ export default function AdminPage() {
     const P75 = baseline.P75[currentMonth];
     const P90 = baseline.P75[currentMonth] * 1.2; // Approssimazione P90
     
-    console.log(`Debug classificazione: preventivi=${preventivi}, stima=${stima}, P10=${P10}, P25=${P25}, P75=${P75}, P90=${P90}`);
+    console.log(`Debug classificazione: preventivi=${preventivi}, preventiviNormalizzati=${preventiviNormalizzati}, ratio=${ratio}, stima=${stima}, P10=${P10}, P25=${P25}, P75=${P75}, P90=${P90}`);
     
     if (stima < P10) return 'Basso';
     if (stima < P25) return 'Medio Basso';

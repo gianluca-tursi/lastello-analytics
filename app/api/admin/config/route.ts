@@ -61,10 +61,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Crea la directory se non esiste
-    await fs.mkdir(path.dirname(CONFIG_FILE), { recursive: true })
+    try {
+      await fs.mkdir(path.dirname(CONFIG_FILE), { recursive: true })
+      console.log('Directory creata/verificata:', path.dirname(CONFIG_FILE))
+    } catch (dirError) {
+      console.error('Errore creazione directory:', dirError)
+    }
     
     // Salva la configurazione
-    await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2))
+    try {
+      await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2))
+      console.log('File salvato con successo:', CONFIG_FILE)
+    } catch (writeError) {
+      console.error('Errore scrittura file:', writeError)
+      throw writeError
+    }
     
     return NextResponse.json({ 
       success: true, 

@@ -46,9 +46,14 @@ export async function POST(request: NextRequest) {
   try {
     const config = await request.json()
     
+    console.log('Config ricevuta:', config)
+    console.log('Tipo preventiviMeseCorrente:', typeof config.preventiviMeseCorrente)
+    console.log('Tipo meseCorrente:', typeof config.meseCorrente)
+    
     // Validazione dati
     if (typeof config.preventiviMeseCorrente !== 'number' || 
         typeof config.meseCorrente !== 'string') {
+      console.log('Validazione fallita')
       return NextResponse.json(
         { error: 'Dati di configurazione non validi' },
         { status: 400 }

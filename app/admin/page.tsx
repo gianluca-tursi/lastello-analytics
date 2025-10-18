@@ -96,26 +96,34 @@ export default function AdminPage() {
   const saveConfig = async () => {
     setIsLoading(true)
     try {
+      const configToSave = {
+        ...config,
+        ultimoAggiornamento: new Date().toLocaleString('it-IT')
+      }
+      
+      console.log('Config da salvare:', configToSave)
+      
       const response = await fetch('/api/admin/config', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...config,
-          ultimoAggiornamento: new Date().toLocaleString('it-IT')
-        }),
+        body: JSON.stringify(configToSave),
       })
+
+      console.log('Response status:', response.status)
+      const responseData = await response.json()
+      console.log('Response data:', responseData)
 
       if (response.ok) {
         setMessage('Configurazione salvata con successo!')
         setTimeout(() => setMessage(''), 3000)
       } else {
-        throw new Error('Errore nel salvataggio')
+        throw new Error(responseData.error || 'Errore nel salvataggio')
       }
     } catch (error) {
       console.error('Errore salvataggio:', error)
-      setMessage('Errore nel salvataggio della configurazione')
+      setMessage(`Errore nel salvataggio della configurazione: ${error.message}`)
     } finally {
       setIsLoading(false)
     }
@@ -174,6 +182,8 @@ export default function AdminPage() {
     const P50 = baseline.P50[currentMonth];
     const P75 = baseline.P75[currentMonth];
     const P90 = baseline.P75[currentMonth] * 1.2; // Approssimazione P90
+    
+    console.log(`Debug classificazione: preventivi=${preventivi}, stima=${stima}, P10=${P10}, P25=${P25}, P75=${P75}, P90=${P90}`);
     
     if (stima < P10) return 'Basso';
     if (stima < P25) return 'Medio Basso';
@@ -280,11 +290,14 @@ export default function AdminPage() {
                         <Input
                           id="preventivi"
                           type="number"
-                          value={config.preventiviMeseCorrente}
-                          onChange={(e) => setConfig(prev => ({ 
-                            ...prev, 
-                            preventiviMeseCorrente: parseInt(e.target.value) || 0 
-                          }))}
+                          value={config.preventiviMeseCorrente || ''}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setConfig(prev => ({ 
+                              ...prev, 
+                              preventiviMeseCorrente: value === '' ? 0 : parseInt(value) || 0 
+                            }));
+                          }}
                           placeholder="es. 176"
                         />
                         <p className="text-xs text-gray-500">

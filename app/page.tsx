@@ -24,46 +24,40 @@ export default function DashboardPage() {
   const [trendType, setTrendType] = useState<'Crescente' | 'Moderato' | 'Decrescente'>('Crescente');
   const { config, isLoading: configLoading } = useConfig();
 
-  // Funzione per calcolare la classificazione basata sui preventivi (metodologia avanzata)
+  // Funzione per calcolare la classificazione basata sui preventivi (metodologia semplificata e stabile)
   const getClassification = (preventivi: number) => {
-    const currentMonth = new Date().getMonth();
+    const currentMonth = new Date().getMonth(); // Ottobre = 9
     
-    // Baseline storica 2019-2024 (P25, P50, P75)
-    const baseline = {
-      P25: [66127, 56743, 57279, 52329, 50882, 48190, 52142, 52297, 48420, 51839, 54337, 60910],
-      P50: [66896, 59077, 60269, 55092, 51812, 50114, 53702, 54847, 49830, 54288, 54786, 65468],
-      P75: [72424, 59996, 66866, 61857, 54211, 51985, 54477, 56433, 50974, 54839, 56353, 67361]
+    // Baseline storica 2019-2024 per ottobre (P25, P50, P75)
+    const baselineOttobre = {
+      P25: 51839,
+      P50: 54288, 
+      P75: 54839
     };
 
     // Calibra baseline 2025 (usando giugno come riferimento)
     const giugno2025 = 49294; // Dato reale giugno 2025
-    const giugnoBaseline = baseline.P50[5]; // Giugno baseline
+    const giugnoBaseline = 50114; // Giugno baseline P50
     const scale = giugno2025 / giugnoBaseline;
     
-    const baseline2025 = baseline.P50.map(p50 => p50 * scale);
+    const baseline2025Ottobre = baselineOttobre.P50 * scale;
     
     // Normalizza preventivi parziali (se siamo a metà mese)
-    const giorniTrascorsi = new Date().getDate();
-    const giorniTotali = new Date(new Date().getFullYear(), currentMonth + 1, 0).getDate();
+    const giorniTrascorsi = new Date().getDate(); // 18 ottobre
+    const giorniTotali = new Date(new Date().getFullYear(), currentMonth + 1, 0).getDate(); // 31 giorni
     const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
     
-    // Elasticità e shrinkage
-    const P_giu = 246; // Preventivi giugno 2025 (dato reale)
-    const ratio = preventiviNormalizzati / P_giu;
-    const e = 0.8; // Elasticità
-    const N0 = 1000; // Shrinkage parameter
+    // Metodologia semplificata: rapporto diretto con baseline
+    const rapporto = preventiviNormalizzati / 246; // 246 = preventivi giugno 2025
+    const stima = baseline2025Ottobre * rapporto;
     
-    // Stima finale
-    const D_raw = baseline2025[currentMonth] * Math.pow(ratio, e);
-    const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
-    const stima = w * D_raw + (1 - w) * baseline2025[currentMonth];
     
-    // Classificazione a 5 livelli basata su quantili
-    const P10 = baseline.P25[currentMonth] * 0.8; // Approssimazione P10
-    const P25 = baseline.P25[currentMonth];
-    const P50 = baseline.P50[currentMonth];
-    const P75 = baseline.P75[currentMonth];
-    const P90 = baseline.P75[currentMonth] * 1.2; // Approssimazione P90
+    // Classificazione basata su percentili della baseline storica
+    const P10 = baselineOttobre.P25 * 0.8; // ~41,471
+    const P25 = baselineOttobre.P25; // 51,839
+    const P50 = baselineOttobre.P50; // 54,288
+    const P75 = baselineOttobre.P75; // 54,839
+    const P90 = baselineOttobre.P75 * 1.2; // ~65,807
     
     if (stima < P10) return 'Basso';
     if (stima < P25) return 'Medio Basso';

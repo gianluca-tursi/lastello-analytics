@@ -116,6 +116,8 @@ export default function AdminPage() {
       console.log('Response data:', responseData)
 
       if (response.ok) {
+        // Salva anche in localStorage come backup
+        localStorage.setItem('lastello-config', JSON.stringify(configToSave))
         setMessage('Configurazione salvata con successo!')
         setTimeout(() => setMessage(''), 3000)
       } else {
@@ -142,131 +144,75 @@ export default function AdminPage() {
     return months[new Date().getMonth()]
   }
 
-  // Funzione per calcolare la stima completa (stessa logica del grafico)
+  // Funzione per calcolare la stima completa (stessa logica semplificata)
   const getStimaCompleta = (preventivi: number) => {
-    const currentMonth = new Date().getMonth();
+    const currentMonth = new Date().getMonth(); // Ottobre = 9
     
-    // Baseline storica 2019-2024 (P25, P50, P75)
-    const baseline = {
-      P25: [66127, 56743, 57279, 52329, 50882, 48190, 52142, 52297, 48420, 51839, 54337, 60910],
-      P50: [66896, 59077, 60269, 55092, 51812, 50114, 53702, 54847, 49830, 54288, 54786, 65468],
-      P75: [72424, 59996, 66866, 61857, 54211, 51985, 54477, 56433, 50974, 54839, 56353, 67361]
+    // Baseline storica 2019-2024 per ottobre (P25, P50, P75)
+    const baselineOttobre = {
+      P25: 51839,
+      P50: 54288, 
+      P75: 54839
     };
 
     // Calibra baseline 2025 (usando giugno come riferimento)
     const giugno2025 = 49294; // Dato reale giugno 2025
-    const giugnoBaseline = baseline.P50[5]; // Giugno baseline
+    const giugnoBaseline = 50114; // Giugno baseline P50
     const scale = giugno2025 / giugnoBaseline;
     
-    const baseline2025 = baseline.P50.map(p50 => p50 * scale);
+    const baseline2025Ottobre = baselineOttobre.P50 * scale;
     
     // Normalizza preventivi parziali (se siamo a metà mese)
-    const giorniTrascorsi = new Date().getDate();
-    const giorniTotali = new Date(new Date().getFullYear(), currentMonth + 1, 0).getDate();
-    const preventiviNormalizzati = giorniTrascorsi < giorniTotali ? 
-      (preventivi / giorniTrascorsi) * giorniTotali : 
-      preventivi;
+    const giorniTrascorsi = new Date().getDate(); // 18 ottobre
+    const giorniTotali = new Date(new Date().getFullYear(), currentMonth + 1, 0).getDate(); // 31 giorni
+    const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
     
-    // Elasticità e shrinkage
-    const P_giu = 246; // Preventivi giugno 2025 (dato reale)
-    const ratio = preventiviNormalizzati / P_giu;
-    const e = 0.8; // Elasticità
-    const N0 = 1000; // Shrinkage parameter
-    
-    // Stima finale con correzione per valori molto bassi
-    const D_raw = baseline2025[currentMonth] * Math.pow(ratio, e);
-    const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
-    let stima = w * D_raw + (1 - w) * baseline2025[currentMonth];
-    
-    // Correzione per valori molto bassi (ratio < 0.1)
-    if (ratio < 0.1) {
-      stima = baseline2025[currentMonth] * ratio * 2; // Stima più conservativa
-    }
-    
-    // Correzione per valori intermedi (0.1 < ratio < 0.5) - bilancia shrinkage
-    if (ratio >= 0.1 && ratio < 0.5) {
-      // Usa una correzione più graduale che mantiene la progressione
-      const w_corretto = Math.min(w * 2, 0.6); // Correzione più moderata
-      stima = w_corretto * D_raw + (1 - w_corretto) * baseline2025[currentMonth];
-    }
-    
-    // Correzione per valori intermedi (0.1 < ratio < 0.5) - bilancia shrinkage
-    if (ratio >= 0.1 && ratio < 0.5) {
-      // Usa una correzione più graduale che mantiene la progressione
-      const w_corretto = Math.min(w * 2, 0.6); // Correzione più moderata
-      stima = w_corretto * D_raw + (1 - w_corretto) * baseline2025[currentMonth];
-    }
-    
-    console.log(`Debug stima completa: preventivi=${preventivi}, preventiviNormalizzati=${preventiviNormalizzati}, ratio=${ratio}, D_raw=${D_raw}, w=${w}, w_corretto=${ratio >= 0.1 && ratio < 0.5 ? Math.min(w * 3, 0.8) : w}, stima=${stima}`);
+    // Metodologia semplificata: rapporto diretto con baseline
+    const rapporto = preventiviNormalizzati / 246; // 246 = preventivi giugno 2025
+    const stima = baseline2025Ottobre * rapporto;
     
     return Math.round(stima);
   };
 
-  // Funzione per calcolare la classificazione basata sui preventivi (metodologia avanzata)
+  // Funzione per calcolare la classificazione basata sui preventivi (metodologia semplificata e stabile)
   const getClassification = (preventivi: number) => {
-    const currentMonth = new Date().getMonth();
+    const currentMonth = new Date().getMonth(); // Ottobre = 9
     
-    // Baseline storica 2019-2024 (P25, P50, P75)
-    const baseline = {
-      P25: [66127, 56743, 57279, 52329, 50882, 48190, 52142, 52297, 48420, 51839, 54337, 60910],
-      P50: [66896, 59077, 60269, 55092, 51812, 50114, 53702, 54847, 49830, 54288, 54786, 65468],
-      P75: [72424, 59996, 66866, 61857, 54211, 51985, 54477, 56433, 50974, 54839, 56353, 67361]
+    // Baseline storica 2019-2024 per ottobre (P25, P50, P75)
+    const baselineOttobre = {
+      P25: 51839,
+      P50: 54288, 
+      P75: 54839
     };
 
     // Calibra baseline 2025 (usando giugno come riferimento)
     const giugno2025 = 49294; // Dato reale giugno 2025
-    const giugnoBaseline = baseline.P50[5]; // Giugno baseline
+    const giugnoBaseline = 50114; // Giugno baseline P50
     const scale = giugno2025 / giugnoBaseline;
     
-    const baseline2025 = baseline.P50.map(p50 => p50 * scale);
+    const baseline2025Ottobre = baselineOttobre.P50 * scale;
     
     // Normalizza preventivi parziali (se siamo a metà mese)
-    const giorniTrascorsi = new Date().getDate();
-    const giorniTotali = new Date(new Date().getFullYear(), currentMonth + 1, 0).getDate();
-    const preventiviNormalizzati = giorniTrascorsi < giorniTotali ? 
-      (preventivi / giorniTrascorsi) * giorniTotali : 
-      preventivi;
+    const giorniTrascorsi = new Date().getDate(); // 18 ottobre
+    const giorniTotali = new Date(new Date().getFullYear(), currentMonth + 1, 0).getDate(); // 31 giorni
+    const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
     
-    // Elasticità e shrinkage
-    const P_giu = 246; // Preventivi giugno 2025 (dato reale)
-    const ratio = preventiviNormalizzati / P_giu;
-    const e = 0.8; // Elasticità
-    const N0 = 1000; // Shrinkage parameter
+    // Metodologia semplificata: rapporto diretto con baseline
+    const rapporto = preventiviNormalizzati / 246; // 246 = preventivi giugno 2025
+    const stima = baseline2025Ottobre * rapporto;
     
-    // Stima finale con correzione per valori molto bassi
-    const D_raw = baseline2025[currentMonth] * Math.pow(ratio, e);
-    const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
-    let stima = w * D_raw + (1 - w) * baseline2025[currentMonth];
+    // Classificazione basata su percentili della baseline storica
+    const P10 = baselineOttobre.P25 * 0.8; // ~41,471
+    const P25 = baselineOttobre.P25; // 51,839
+    const P50 = baselineOttobre.P50; // 54,288
+    const P75 = baselineOttobre.P75; // 54,839
+    const P90 = baselineOttobre.P75 * 1.2; // ~65,807
     
-    // Correzione per valori molto bassi (ratio < 0.1)
-    if (ratio < 0.1) {
-      stima = baseline2025[currentMonth] * ratio * 2; // Stima più conservativa
-    }
-    
-    // Correzione per valori intermedi (0.1 < ratio < 0.5) - bilancia shrinkage
-    if (ratio >= 0.1 && ratio < 0.5) {
-      // Usa una correzione più graduale che mantiene la progressione
-      const w_corretto = Math.min(w * 2, 0.6); // Correzione più moderata
-      stima = w_corretto * D_raw + (1 - w_corretto) * baseline2025[currentMonth];
-    }
-    
-    // Classificazione a 5 livelli basata su quantili
-    const P10 = baseline.P25[currentMonth] * 0.8; // Approssimazione P10
-    const P25 = baseline.P25[currentMonth];
-    const P50 = baseline.P50[currentMonth];
-    const P75 = baseline.P75[currentMonth];
-    const P90 = baseline.P75[currentMonth] * 1.2; // Approssimazione P90
-    
-    let classificazione = '';
-    if (stima < P10) classificazione = 'Basso';
-    else if (stima < P25) classificazione = 'Medio Basso';
-    else if (stima < P75) classificazione = 'Normale';
-    else if (stima < P90) classificazione = 'Medio Alto';
-    else classificazione = 'Alto';
-    
-    console.log(`Debug classificazione: preventivi=${preventivi}, preventiviNormalizzati=${preventiviNormalizzati}, ratio=${ratio}, stima=${stima}, P10=${P10}, P25=${P25}, P75=${P75}, P90=${P90}, RISULTATO=${classificazione}`);
-    
-    return classificazione;
+    if (stima < P10) return 'Basso';
+    if (stima < P25) return 'Medio Basso';
+    if (stima < P75) return 'Normale';
+    if (stima < P90) return 'Medio Alto';
+    return 'Alto';
   };
 
   const updateCurrentMonth = () => {
@@ -414,6 +360,131 @@ export default function AdminPage() {
                           </div>
                         </CardContent>
                       </Card>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Tabella Debug Formula */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Debug Formula - Analisi Calcoli</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Tabella per analizzare i salti nella formula. Mostra preventivi da 1 a 200 con tutti i calcoli intermedi.
+                    </p>
+                    
+                    {/* Valori di Soglia e Preventivi Necessari */}
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+                      {(() => {
+                        // Calcola i preventivi necessari per ogni soglia
+                        const giorniTrascorsi = 18;
+                        const giorniTotali = 31;
+                        const giugno2025 = 49294;
+                        const giugnoBaseline = 50114;
+                        const scale = giugno2025 / giugnoBaseline;
+                        const baseline2025Ottobre = 54288 * scale;
+                        
+                        const soglie = [
+                          { nome: 'P10 (Basso)', valore: 41471, colore: 'red' },
+                          { nome: 'P25 (Medio Basso)', valore: 51839, colore: 'orange' },
+                          { nome: 'P50 (Normale)', valore: 54288, colore: 'yellow' },
+                          { nome: 'P75 (Medio Alto)', valore: 54839, colore: 'blue' },
+                          { nome: 'P90 (Alto)', valore: 65807, colore: 'green' }
+                        ];
+                        
+                        return soglie.map((soglia) => {
+                          // Calcola preventivi necessari: stima = baseline * rapporto
+                          // rapporto = preventiviNormalizzati / 246
+                          // preventiviNormalizzati = (preventivi / 18) * 31
+                          const rapporto = soglia.valore / baseline2025Ottobre;
+                          const preventiviNormalizzati = rapporto * 246;
+                          const preventiviNecessari = Math.round((preventiviNormalizzati * giorniTrascorsi) / giorniTotali);
+                          
+                          return (
+                            <div key={soglia.nome} className={`p-3 bg-${soglia.colore}-50 dark:bg-${soglia.colore}-900/20 rounded-lg border border-${soglia.colore}-200`}>
+                              <div className={`text-sm font-semibold text-${soglia.colore}-800`}>{soglia.nome}</div>
+                              <div className={`text-lg font-mono text-${soglia.colore}-600`}>{soglia.valore.toLocaleString()}</div>
+                              <div className={`text-xs text-${soglia.colore}-600 mt-1`}>Preventivi: {preventiviNecessari}</div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+
+                    <div className="max-h-96 overflow-auto border rounded-lg">
+                      <table className="w-full text-xs">
+                        <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+                          <tr>
+                            <th className="px-2 py-1 text-left border-b">Preventivi</th>
+                            <th className="px-2 py-1 text-left border-b">Normalizzati</th>
+                            <th className="px-2 py-1 text-left border-b">Rapporto</th>
+                            <th className="px-2 py-1 text-left border-b">Baseline 2025</th>
+                            <th className="px-2 py-1 text-left border-b">Stima</th>
+                            <th className="px-2 py-1 text-left border-b">Classificazione</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Array.from({ length: 200 }, (_, i) => i + 1).map((preventivi) => {
+                            const currentMonth = 9; // Ottobre = 9
+                            
+                            // Baseline storica 2019-2024 per ottobre
+                            const baselineOttobre = {
+                              P25: 51839,
+                              P50: 54288, 
+                              P75: 54839
+                            };
+
+                            // Calibra baseline 2025
+                            const giugno2025 = 49294;
+                            const giugnoBaseline = 50114;
+                            const scale = giugno2025 / giugnoBaseline;
+                            const baseline2025Ottobre = baselineOttobre.P50 * scale;
+                            
+                            // Normalizza preventivi parziali (18 ottobre su 31 giorni)
+                            const giorniTrascorsi = 18;
+                            const giorniTotali = 31;
+                            const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
+                            
+                            // Metodologia semplificata
+                            const rapporto = preventiviNormalizzati / 246;
+                            const stima = baseline2025Ottobre * rapporto;
+                            
+                            // Classificazione
+                            const P10 = baselineOttobre.P25 * 0.8;
+                            const P25 = baselineOttobre.P25;
+                            const P50 = baselineOttobre.P50;
+                            const P75 = baselineOttobre.P75;
+                            const P90 = baselineOttobre.P75 * 1.2;
+                            
+                            let classificazione = '';
+                            if (stima < P10) classificazione = 'Basso';
+                            else if (stima < P25) classificazione = 'Medio Basso';
+                            else if (stima < P75) classificazione = 'Normale';
+                            else if (stima < P90) classificazione = 'Medio Alto';
+                            else classificazione = 'Alto';
+
+                            return (
+                              <tr key={preventivi} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <td className="px-2 py-1 border-b font-mono">{preventivi}</td>
+                                <td className="px-2 py-1 border-b font-mono">{preventiviNormalizzati.toFixed(1)}</td>
+                                <td className="px-2 py-1 border-b font-mono">{rapporto.toFixed(3)}</td>
+                                <td className="px-2 py-1 border-b font-mono">{baseline2025Ottobre.toFixed(0)}</td>
+                                <td className="px-2 py-1 border-b font-mono">{Math.round(stima).toLocaleString()}</td>
+                                <td className="px-2 py-1 border-b">
+                                  <span className={`px-2 py-1 rounded text-xs ${
+                                    classificazione === 'Basso' ? 'bg-red-100 text-red-800' :
+                                    classificazione === 'Medio Basso' ? 'bg-orange-100 text-orange-800' :
+                                    classificazione === 'Normale' ? 'bg-yellow-100 text-yellow-800' :
+                                    classificazione === 'Medio Alto' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-green-100 text-green-800'
+                                  }`}>
+                                    {classificazione}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
 

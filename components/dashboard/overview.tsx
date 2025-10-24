@@ -143,9 +143,9 @@ const data = [
 export function Overview() {
   const { config } = useConfig();
 
-  // Funzione per calcolare la classificazione basata sui preventivi (metodologia avanzata)
+  // Funzione per calcolare la classificazione basata sui preventivi (logica semplificata e stabile)
   const getClassification = (preventivi: number, monthIndex: number) => {
-    // Baseline storica 2019-2024 (P25, P50, P75)
+    // Baseline storica 2019-2024 per il mese specifico
     const baseline = {
       P25: [66127, 56743, 57279, 52329, 50882, 48190, 52142, 52297, 48420, 51839, 54337, 60910],
       P50: [66896, 59077, 60269, 55092, 51812, 50114, 53702, 54847, 49830, 54288, 54786, 65468],
@@ -157,30 +157,23 @@ export function Overview() {
     const giugnoBaseline = baseline.P50[5]; // Giugno baseline
     const scale = giugno2025 / giugnoBaseline;
     
-    const baseline2025 = baseline.P50.map(p50 => p50 * scale);
+    const baseline2025Mese = baseline.P50[monthIndex] * scale;
     
     // Normalizza preventivi parziali (se siamo a metà mese)
     const giorniTrascorsi = new Date().getDate();
     const giorniTotali = new Date(new Date().getFullYear(), monthIndex + 1, 0).getDate();
     const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
     
-    // Elasticità e shrinkage
-    const P_giu = 246; // Preventivi giugno 2025 (dato reale)
-    const ratio = preventiviNormalizzati / P_giu;
-    const e = 0.8; // Elasticità
-    const N0 = 1000; // Shrinkage parameter
+    // Metodologia semplificata: rapporto diretto con baseline
+    const rapporto = preventiviNormalizzati / 246; // 246 = preventivi giugno 2025
+    const stima = baseline2025Mese * rapporto;
     
-    // Stima finale
-    const D_raw = baseline2025[monthIndex] * Math.pow(ratio, e);
-    const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
-    const stima = w * D_raw + (1 - w) * baseline2025[monthIndex];
-    
-    // Classificazione a 5 livelli basata su quantili
-    const P10 = baseline.P25[monthIndex] * 0.8; // Approssimazione P10
+    // Classificazione basata su percentili della baseline storica
+    const P10 = baseline.P25[monthIndex] * 0.8;
     const P25 = baseline.P25[monthIndex];
     const P50 = baseline.P50[monthIndex];
     const P75 = baseline.P75[monthIndex];
-    const P90 = baseline.P75[monthIndex] * 1.2; // Approssimazione P90
+    const P90 = baseline.P75[monthIndex] * 1.2;
     
     if (stima < P10) return 'BASSO';
     if (stima < P25) return 'MEDIO_BASSO';
@@ -189,9 +182,9 @@ export function Overview() {
     return 'ALTO';
   };
 
-  // Funzione per calcolare la stima completa (stessa logica di getClassification)
+  // Funzione per calcolare la stima completa (logica semplificata e stabile)
   const getStimaCompleta = (preventivi: number, monthIndex: number) => {
-    // Baseline storica 2019-2024 (P25, P50, P75)
+    // Baseline storica 2019-2024 per il mese specifico
     const baseline = {
       P25: [66127, 56743, 57279, 52329, 50882, 48190, 52142, 52297, 48420, 51839, 54337, 60910],
       P50: [66896, 59077, 60269, 55092, 51812, 50114, 53702, 54847, 49830, 54288, 54786, 65468],
@@ -203,23 +196,16 @@ export function Overview() {
     const giugnoBaseline = baseline.P50[5]; // Giugno baseline
     const scale = giugno2025 / giugnoBaseline;
     
-    const baseline2025 = baseline.P50.map(p50 => p50 * scale);
+    const baseline2025Mese = baseline.P50[monthIndex] * scale;
     
     // Normalizza preventivi parziali (se siamo a metà mese)
     const giorniTrascorsi = new Date().getDate();
     const giorniTotali = new Date(new Date().getFullYear(), monthIndex + 1, 0).getDate();
     const preventiviNormalizzati = (preventivi / giorniTrascorsi) * giorniTotali;
     
-    // Elasticità e shrinkage
-    const P_giu = 246; // Preventivi giugno 2025 (dato reale)
-    const ratio = preventiviNormalizzati / P_giu;
-    const e = 0.8; // Elasticità
-    const N0 = 1000; // Shrinkage parameter
-    
-    // Stima finale
-    const D_raw = baseline2025[monthIndex] * Math.pow(ratio, e);
-    const w = preventiviNormalizzati / (preventiviNormalizzati + N0);
-    const stima = w * D_raw + (1 - w) * baseline2025[monthIndex];
+    // Metodologia semplificata: rapporto diretto con baseline
+    const rapporto = preventiviNormalizzati / 246; // 246 = preventivi giugno 2025
+    const stima = baseline2025Mese * rapporto;
     
     return Math.round(stima);
   };

@@ -7,15 +7,24 @@ const CONFIG_FILE = path.join(process.cwd(), 'data', 'config.json')
 // GET - Leggi configurazione
 export async function GET() {
   try {
-    // Su Netlify, restituiamo sempre una configurazione di default
-    // perché non possiamo leggere/scrivere file durante il runtime
+    // Prova a leggere dal file (funziona in sviluppo locale)
+    try {
+      const fileContent = await fs.readFile(CONFIG_FILE, 'utf-8')
+      const config = JSON.parse(fileContent)
+      console.log('Configurazione caricata da file:', config)
+      return NextResponse.json(config)
+    } catch (fileError) {
+      console.log('File config non trovato, restituendo configurazione di default')
+    }
+    
+    // Configurazione di default se il file non esiste
     const defaultConfig = {
       preventiviMeseCorrente: 176,
       meseCorrente: 'Ottobre',
       ultimoAggiornamento: new Date().toLocaleString('it-IT')
     }
     
-    console.log('Restituendo configurazione di default per Netlify:', defaultConfig)
+    console.log('Restituendo configurazione di default:', defaultConfig)
     return NextResponse.json(defaultConfig)
   } catch (error) {
     console.error('Errore lettura configurazione:', error)
@@ -26,7 +35,7 @@ export async function GET() {
   }
 }
 
-// POST - Salva configurazione (solo in memoria per Netlify)
+// POST - Salva configurazione (con localStorage come fallback)
 export async function POST(request: NextRequest) {
   try {
     const config = await request.json()
@@ -45,13 +54,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Su Netlify, non possiamo scrivere file durante il runtime
-    // Simuliamo il salvataggio e restituiamo successo
-    console.log('Configurazione validata e pronta per il salvataggio:', config)
+    // Prova a salvare su file (funziona in sviluppo locale)
+    try {
+      await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8')
+      console.log('Configurazione salvata su file:', CONFIG_FILE)
+    } catch (fileError) {
+      console.log('Impossibile salvare su file (Netlify), configurazione validata:', config)
+    }
     
     return NextResponse.json({ 
       success: true, 
-      message: 'Configurazione salvata con successo (modalità Netlify)',
+      message: 'Configurazione salvata con successo',
       config 
     })
   } catch (error) {

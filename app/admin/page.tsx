@@ -122,12 +122,18 @@ export default function AdminPage() {
       console.log('Response data:', responseData)
 
       if (response.ok) {
-        console.log('Configurazione salvata su file:', responseData.config)
+        console.log('Configurazione salvata:', responseData.config)
         
         // Aggiorna lo stato locale con i nuovi dati
         setConfig(responseData.config)
         
-        setMessage('Configurazione salvata su file con successo!')
+        // Salva sempre in localStorage come backup
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('lastello-config', JSON.stringify(configToSave))
+          console.log('Configurazione salvata anche in localStorage:', configToSave)
+        }
+        
+        setMessage(responseData.message)
         
         // Verifica che i dati siano stati salvati correttamente
         setTimeout(() => {

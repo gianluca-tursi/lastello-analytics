@@ -65,7 +65,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Salva sempre su file
+    // Prova a salvare su file (funziona in locale)
+    let fileSaved = false
+    let message = 'Configurazione salvata'
+    
     try {
       // Assicurati che la directory esista
       const dataDir = path.dirname(CONFIG_FILE)
@@ -75,24 +78,21 @@ export async function POST(request: NextRequest) {
       await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8')
       console.log('Configurazione salvata su file:', CONFIG_FILE)
       console.log('Contenuto salvato:', config)
-      
-      return NextResponse.json({ 
-        success: true, 
-        message: 'Configurazione salvata su file con successo',
-        config,
-        fileSaved: true
-      })
+      fileSaved = true
+      message = 'Configurazione salvata su file (modalità locale)'
     } catch (fileError) {
-      console.error('Errore salvataggio su file:', fileError)
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Errore nel salvataggio su file',
-          details: fileError instanceof Error ? fileError.message : String(fileError)
-        },
-        { status: 500 }
-      )
+      console.log('Impossibile salvare su file (Netlify), configurazione validata:', config)
+      console.log('Errore file:', fileError instanceof Error ? fileError.message : String(fileError))
+      fileSaved = false
+      message = 'Configurazione validata (modalità Netlify - usa localStorage)'
     }
+    
+    return NextResponse.json({ 
+      success: true, 
+      message,
+      config,
+      fileSaved
+    })
   } catch (error) {
     console.error('Errore salvataggio configurazione:', error)
     return NextResponse.json(

@@ -39,12 +39,42 @@ export function useConfig() {
       if (response.ok) {
         const configData = await response.json()
         setConfig(configData)
+        // Salva anche in localStorage come backup per Netlify
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('lastello-config', JSON.stringify(configData))
+        }
         console.log('Configurazione caricata dal server:', configData)
       } else {
         console.error('Errore caricamento configurazione dal server:', response.status)
+        // Fallback a localStorage se il server non risponde
+        if (typeof window !== 'undefined') {
+          const localConfig = localStorage.getItem('lastello-config')
+          if (localConfig) {
+            try {
+              const parsedConfig = JSON.parse(localConfig)
+              setConfig(parsedConfig)
+              console.log('Configurazione caricata da localStorage (fallback):', parsedConfig)
+            } catch (parseError) {
+              console.warn('Errore parsing localStorage config:', parseError)
+            }
+          }
+        }
       }
     } catch (error) {
       console.error('Errore caricamento configurazione:', error)
+      // Fallback a localStorage in caso di errore di rete
+      if (typeof window !== 'undefined') {
+        const localConfig = localStorage.getItem('lastello-config')
+        if (localConfig) {
+          try {
+            const parsedConfig = JSON.parse(localConfig)
+            setConfig(parsedConfig)
+            console.log('Configurazione caricata da localStorage (fallback):', parsedConfig)
+          } catch (parseError) {
+            console.warn('Errore parsing localStorage config:', parseError)
+          }
+        }
+      }
     } finally {
       setIsLoading(false)
     }

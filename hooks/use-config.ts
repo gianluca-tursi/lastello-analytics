@@ -34,48 +34,55 @@ export function useConfig() {
 
   const loadConfig = async () => {
     try {
-      console.log('Caricamento configurazione dal server...')
+      console.log('useConfig: Caricamento configurazione dal server...')
       const response = await fetch('/api/admin/config')
+      console.log('useConfig: Response status:', response.status)
+      
       if (response.ok) {
         const configData = await response.json()
+        console.log('useConfig: Dati ricevuti dal server:', configData)
         setConfig(configData)
         // Salva anche in localStorage come backup per Netlify
         if (typeof window !== 'undefined') {
           localStorage.setItem('lastello-config', JSON.stringify(configData))
+          console.log('useConfig: Salvato anche in localStorage:', configData)
         }
-        console.log('Configurazione caricata dal server:', configData)
+        console.log('useConfig: Configurazione caricata dal server:', configData)
       } else {
-        console.error('Errore caricamento configurazione dal server:', response.status)
+        console.error('useConfig: Errore caricamento configurazione dal server:', response.status)
         // Fallback a localStorage se il server non risponde
         if (typeof window !== 'undefined') {
           const localConfig = localStorage.getItem('lastello-config')
+          console.log('useConfig: Tentativo fallback localStorage:', localConfig)
           if (localConfig) {
             try {
               const parsedConfig = JSON.parse(localConfig)
               setConfig(parsedConfig)
-              console.log('Configurazione caricata da localStorage (fallback):', parsedConfig)
+              console.log('useConfig: Configurazione caricata da localStorage (fallback):', parsedConfig)
             } catch (parseError) {
-              console.warn('Errore parsing localStorage config:', parseError)
+              console.warn('useConfig: Errore parsing localStorage config:', parseError)
             }
           }
         }
       }
     } catch (error) {
-      console.error('Errore caricamento configurazione:', error)
+      console.error('useConfig: Errore caricamento configurazione:', error)
       // Fallback a localStorage in caso di errore di rete
       if (typeof window !== 'undefined') {
         const localConfig = localStorage.getItem('lastello-config')
+        console.log('useConfig: Tentativo fallback localStorage (errore rete):', localConfig)
         if (localConfig) {
           try {
             const parsedConfig = JSON.parse(localConfig)
             setConfig(parsedConfig)
-            console.log('Configurazione caricata da localStorage (fallback):', parsedConfig)
+            console.log('useConfig: Configurazione caricata da localStorage (fallback):', parsedConfig)
           } catch (parseError) {
-            console.warn('Errore parsing localStorage config:', parseError)
+            console.warn('useConfig: Errore parsing localStorage config:', parseError)
           }
         }
       }
     } finally {
+      console.log('useConfig: Caricamento completato, isLoading = false')
       setIsLoading(false)
     }
   }
@@ -83,7 +90,7 @@ export function useConfig() {
   // Ascolta i cambiamenti di focus per aggiornamenti quando si torna dalla pagina admin
   useEffect(() => {
     const handleFocus = () => {
-      console.log('Focus ripristinato, ricaricando configurazione...')
+      console.log('useConfig: Focus ripristinato, ricaricando configurazione...')
       loadConfig()
     }
     window.addEventListener('focus', handleFocus)

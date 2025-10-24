@@ -144,27 +144,38 @@ export function Overview() {
   const { config, isLoading } = useConfig();
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Debug: Log della configurazione caricata
+  useEffect(() => {
+    console.log('Overview: Configurazione caricata:', config);
+    console.log('Overview: isLoading:', isLoading);
+  }, [config, isLoading]);
+
   // Forza il re-render quando la configurazione cambia
   useEffect(() => {
     if (!isLoading && config.preventiviMeseCorrente) {
+      console.log('Overview: Forzando re-render con preventivi:', config.preventiviMeseCorrente);
       setRefreshKey(prev => prev + 1);
     }
   }, [config.preventiviMeseCorrente, config.meseCorrente, isLoading]);
 
   // Ascolta i cambiamenti di localStorage per aggiornamenti in tempo reale
   useEffect(() => {
-    const handleStorageChange = () => {
+    const handleStorageChange = (e: StorageEvent) => {
+      console.log('Overview: StorageEvent ricevuto:', e.key, e.newValue);
+      setRefreshKey(prev => prev + 1);
+    };
+
+    const handleFocus = () => {
+      console.log('Overview: Focus event ricevuto, aggiornando...');
       setRefreshKey(prev => prev + 1);
     };
 
     window.addEventListener('storage', handleStorageChange);
-    
-    // Ascolta anche i cambiamenti di focus (quando l'utente torna dalla pagina admin)
-    window.addEventListener('focus', handleStorageChange);
+    window.addEventListener('focus', handleFocus);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('focus', handleStorageChange);
+      window.removeEventListener('focus', handleFocus);
     };
   }, []);
 

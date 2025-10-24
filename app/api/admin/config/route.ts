@@ -7,35 +7,23 @@ const CONFIG_FILE = path.join(process.cwd(), 'data', 'config.json')
 // GET - Leggi configurazione
 export async function GET() {
   try {
-    // Prova a leggere dal file
+    // Leggi sempre dal file JSON statico
     try {
       const fileContent = await fs.readFile(CONFIG_FILE, 'utf-8')
       const config = JSON.parse(fileContent)
-      console.log('Configurazione caricata da file:', config)
+      console.log('Configurazione caricata da file JSON:', config)
       return NextResponse.json(config)
     } catch (fileError) {
-      console.log('File config non trovato o errore lettura:', fileError instanceof Error ? fileError.message : String(fileError))
+      console.log('File config non trovato, restituendo configurazione di default')
       
-      // Se il file non esiste, crealo con valori di default
+      // Configurazione di default se il file non esiste
       const defaultConfig = {
         preventiviMeseCorrente: 176,
         meseCorrente: 'Ottobre',
         ultimoAggiornamento: new Date().toLocaleString('it-IT')
       }
       
-      try {
-        // Crea la directory se non esiste
-        const dataDir = path.dirname(CONFIG_FILE)
-        await fs.mkdir(dataDir, { recursive: true })
-        
-        // Crea il file con i valori di default
-        await fs.writeFile(CONFIG_FILE, JSON.stringify(defaultConfig, null, 2), 'utf-8')
-        console.log('File config creato con valori di default:', defaultConfig)
-        return NextResponse.json(defaultConfig)
-      } catch (createError) {
-        console.error('Errore creazione file config:', createError)
-        return NextResponse.json(defaultConfig)
-      }
+      return NextResponse.json(defaultConfig)
     }
   } catch (error) {
     console.error('Errore lettura configurazione:', error)
@@ -65,34 +53,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Prova a salvare su file (funziona in locale)
-    let fileSaved = false
-    let message = 'Configurazione salvata'
-    
+    // Salva sempre nel file JSON
     try {
       // Assicurati che la directory esista
       const dataDir = path.dirname(CONFIG_FILE)
       await fs.mkdir(dataDir, { recursive: true })
       
-      // Salva la configurazione
+      // Salva la configurazione nel file JSON
       await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8')
-      console.log('Configurazione salvata su file:', CONFIG_FILE)
+      console.log('Configurazione salvata su file JSON:', CONFIG_FILE)
       console.log('Contenuto salvato:', config)
-      fileSaved = true
-      message = 'Configurazione salvata su file (modalità locale)'
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Configurazione salvata su file JSON con successo',
+        config,
+        fileSaved: true
+      })
     } catch (fileError) {
-      console.log('Impossibile salvare su file (Netlify), configurazione validata:', config)
-      console.log('Errore file:', fileError instanceof Error ? fileError.message : String(fileError))
-      fileSaved = false
-      message = 'Configurazione validata (modalità Netlify - usa localStorage)'
+      console.error('Errore salvataggio su file JSON:', fileError)
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Errore nel salvataggio su file JSON',
+          details: fileError instanceof Error ? fileError.message : String(fileError)
+        },
+        { status: 500 }
+      )
     }
-    
-    return NextResponse.json({ 
-      success: true, 
-      message,
-      config,
-      fileSaved
-    })
   } catch (error) {
     console.error('Errore salvataggio configurazione:', error)
     return NextResponse.json(

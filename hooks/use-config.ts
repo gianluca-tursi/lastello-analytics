@@ -42,45 +42,12 @@ export function useConfig() {
         const configData = await response.json()
         console.log('useConfig: Dati ricevuti dal server:', configData)
         setConfig(configData)
-        // Salva anche in localStorage come backup per Netlify
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('lastello-config', JSON.stringify(configData))
-          console.log('useConfig: Salvato anche in localStorage:', configData)
-        }
         console.log('useConfig: Configurazione caricata dal server:', configData)
       } else {
         console.error('useConfig: Errore caricamento configurazione dal server:', response.status)
-        // Fallback a localStorage se il server non risponde
-        if (typeof window !== 'undefined') {
-          const localConfig = localStorage.getItem('lastello-config')
-          console.log('useConfig: Tentativo fallback localStorage:', localConfig)
-          if (localConfig) {
-            try {
-              const parsedConfig = JSON.parse(localConfig)
-              setConfig(parsedConfig)
-              console.log('useConfig: Configurazione caricata da localStorage (fallback):', parsedConfig)
-            } catch (parseError) {
-              console.warn('useConfig: Errore parsing localStorage config:', parseError)
-            }
-          }
-        }
       }
     } catch (error) {
       console.error('useConfig: Errore caricamento configurazione:', error)
-      // Fallback a localStorage in caso di errore di rete
-      if (typeof window !== 'undefined') {
-        const localConfig = localStorage.getItem('lastello-config')
-        console.log('useConfig: Tentativo fallback localStorage (errore rete):', localConfig)
-        if (localConfig) {
-          try {
-            const parsedConfig = JSON.parse(localConfig)
-            setConfig(parsedConfig)
-            console.log('useConfig: Configurazione caricata da localStorage (fallback):', parsedConfig)
-          } catch (parseError) {
-            console.warn('useConfig: Errore parsing localStorage config:', parseError)
-          }
-        }
-      }
     } finally {
       console.log('useConfig: Caricamento completato, isLoading = false')
       setIsLoading(false)

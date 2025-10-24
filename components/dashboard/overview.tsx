@@ -1,7 +1,7 @@
 'use client';
 
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Legend, Area, AreaChart, ReferenceLine } from 'recharts';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useConfig } from '@/hooks/use-config';
 
 // Dati del Termometro mortalità - Italia (aggiornati con dati ISTAT)
@@ -141,7 +141,32 @@ const data = [
 ];
 
 export function Overview() {
-  const { config } = useConfig();
+  const { config, isLoading } = useConfig();
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Forza il re-render quando la configurazione cambia
+  useEffect(() => {
+    if (!isLoading && config.preventiviMeseCorrente) {
+      setRefreshKey(prev => prev + 1);
+    }
+  }, [config.preventiviMeseCorrente, config.meseCorrente, isLoading]);
+
+  // Ascolta i cambiamenti di localStorage per aggiornamenti in tempo reale
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setRefreshKey(prev => prev + 1);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Ascolta anche i cambiamenti di focus (quando l'utente torna dalla pagina admin)
+    window.addEventListener('focus', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleStorageChange);
+    };
+  }, []);
 
   // Funzione per calcolare la classificazione basata sui preventivi (logica semplificata e stabile)
   const getClassification = (preventivi: number, monthIndex: number) => {

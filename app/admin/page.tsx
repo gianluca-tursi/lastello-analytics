@@ -118,6 +118,14 @@ export default function AdminPage() {
       if (response.ok) {
         // Salva anche in localStorage come backup
         localStorage.setItem('lastello-config', JSON.stringify(configToSave))
+        
+        // Notifica il cambiamento per aggiornare altri componenti
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'lastello-config',
+          newValue: JSON.stringify(configToSave),
+          oldValue: localStorage.getItem('lastello-config')
+        }))
+        
         setMessage('Configurazione salvata con successo!')
         setTimeout(() => setMessage(''), 3000)
       } else {

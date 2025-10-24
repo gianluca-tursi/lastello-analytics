@@ -50,5 +50,33 @@ export function useConfig() {
     }
   }
 
+  // Ascolta i cambiamenti di localStorage per aggiornamenti in tempo reale
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'lastello-config' && e.newValue) {
+        try {
+          const newConfig = JSON.parse(e.newValue)
+          setConfig(newConfig)
+          console.log('Configurazione aggiornata da localStorage:', newConfig)
+        } catch (error) {
+          console.error('Errore parsing nuova configurazione:', error)
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Ascolta anche i cambiamenti di focus (quando l'utente torna dalla pagina admin)
+    const handleFocus = () => {
+      loadConfig()
+    }
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [])
+
   return { config, isLoading, refetch: loadConfig }
 }

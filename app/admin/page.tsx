@@ -116,8 +116,9 @@ export default function AdminPage() {
       console.log('Response data:', responseData)
 
       if (response.ok) {
-        // Salva anche in localStorage come backup
+        // Salva SEMPRE in localStorage come backup principale
         localStorage.setItem('lastello-config', JSON.stringify(configToSave))
+        console.log('Configurazione salvata in localStorage:', configToSave)
         
         // Notifica il cambiamento per aggiornare altri componenti
         window.dispatchEvent(new StorageEvent('storage', {
@@ -126,7 +127,27 @@ export default function AdminPage() {
           oldValue: localStorage.getItem('lastello-config')
         }))
         
-        setMessage('Configurazione salvata con successo!')
+        // Mostra messaggio basato sul tipo di salvataggio
+        const message = responseData.fileSaved 
+          ? 'Configurazione salvata su server e in locale!'
+          : 'Configurazione salvata in locale (modalità Netlify)!'
+        
+        setMessage(message)
+        
+        // Verifica che i dati siano stati salvati correttamente
+        setTimeout(() => {
+          const savedConfig = localStorage.getItem('lastello-config')
+          if (savedConfig) {
+            const parsed = JSON.parse(savedConfig)
+            console.log('Verifica salvataggio - Dati salvati:', parsed)
+            if (parsed.preventiviMeseCorrente === configToSave.preventiviMeseCorrente) {
+              console.log('✅ Salvataggio verificato con successo')
+            } else {
+              console.error('❌ Errore: Dati non salvati correttamente')
+            }
+          }
+        }, 100)
+        
         setTimeout(() => setMessage(''), 3000)
       } else {
         throw new Error(responseData.error || 'Errore nel salvataggio')

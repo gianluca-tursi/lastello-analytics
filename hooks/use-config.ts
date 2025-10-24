@@ -22,19 +22,21 @@ export function useConfig() {
 
   const loadConfig = async () => {
     try {
-      // Prima prova a caricare da localStorage (fallback)
+      // Prima prova a caricare da localStorage (priorità)
       const localConfig = localStorage.getItem('lastello-config')
       if (localConfig) {
         try {
           const parsedConfig = JSON.parse(localConfig)
           setConfig(parsedConfig)
           console.log('Configurazione caricata da localStorage:', parsedConfig)
+          setIsLoading(false)
+          return // Esci subito se abbiamo dati locali validi
         } catch (parseError) {
           console.warn('Errore parsing localStorage config:', parseError)
         }
       }
 
-      // Poi prova a caricare dal server
+      // Solo se non ci sono dati locali, prova a caricare dal server
       const response = await fetch('/api/admin/config')
       if (response.ok) {
         const configData = await response.json()

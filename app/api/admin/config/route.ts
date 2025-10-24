@@ -55,17 +55,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Prova a salvare su file (funziona in sviluppo locale)
+    let fileSaved = false
     try {
       await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8')
       console.log('Configurazione salvata su file:', CONFIG_FILE)
+      fileSaved = true
     } catch (fileError) {
       console.log('Impossibile salvare su file (Netlify), configurazione validata:', config)
+      fileSaved = false
     }
     
     return NextResponse.json({ 
       success: true, 
-      message: 'Configurazione salvata con successo',
-      config 
+      message: fileSaved ? 'Configurazione salvata su server' : 'Configurazione salvata in locale (modalità Netlify)',
+      config,
+      fileSaved
     })
   } catch (error) {
     console.error('Errore salvataggio configurazione:', error)

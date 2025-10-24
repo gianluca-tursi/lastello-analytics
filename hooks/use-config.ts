@@ -9,26 +9,60 @@ interface ConfigData {
 }
 
 export function useConfig() {
-  const [config, setConfig] = useState<ConfigData>({
-    preventiviMeseCorrente: 176,
-    meseCorrente: 'Ottobre',
-    ultimoAggiornamento: new Date().toLocaleString('it-IT')
-  })
+  // Carica immediatamente i dati da localStorage se disponibili
+  const getInitialConfig = (): ConfigData => {
+    if (typeof window !== 'undefined') {
+      try {
+        const localConfig = localStorage.getItem('lastello-config')
+        if (localConfig) {
+          const parsed = JSON.parse(localConfig)
+          console.log('Configurazione iniziale caricata da localStorage:', parsed)
+          return parsed
+        }
+      } catch (error) {
+        console.warn('Errore caricamento configurazione iniziale:', error)
+      }
+    }
+    return {
+      preventiviMeseCorrente: 176,
+      meseCorrente: 'Ottobre',
+      ultimoAggiornamento: new Date().toLocaleString('it-IT')
+    }
+  }
+
+  const [config, setConfig] = useState<ConfigData>(getInitialConfig())
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    // Forza il caricamento anche se abbiamo dati iniziali
     loadConfig()
+  }, [])
+
+  // Aggiungi anche un listener per il caricamento della pagina
+  useEffect(() => {
+    const handlePageLoad = () => {
+      console.log('Pagina caricata, verificando configurazione...')
+      loadConfig()
+    }
+
+    window.addEventListener('load', handlePageLoad)
+    return () => window.removeEventListener('load', handlePageLoad)
   }, [])
 
   const loadConfig = async () => {
     try {
-      // Prima prova a caricare da localStorage (priorità)
+      // Controlla se abbiamo già dati validi da localStorage
       const localConfig = localStorage.getItem('lastello-config')
       if (localConfig) {
         try {
           const parsedConfig = JSON.parse(localConfig)
-          setConfig(parsedConfig)
-          console.log('Configurazione caricata da localStorage:', parsedConfig)
+          // Solo aggiorna se i dati sono diversi da quelli attuali
+          if (parsedConfig.preventiviMeseCorrente !== config.preventiviMeseCorrente) {
+            setConfig(parsedConfig)
+            console.log('Configurazione aggiornata da localStorage:', parsedConfig)
+          } else {
+            console.log('Configurazione già sincronizzata con localStorage')
+          }
           setIsLoading(false)
           return // Esci subito se abbiamo dati locali validi
         } catch (parseError) {
@@ -37,6 +71,7 @@ export function useConfig() {
       }
 
       // Solo se non ci sono dati locali, prova a caricare dal server
+      console.log('Nessun dato locale trovato, caricamento dal server...')
       const response = await fetch('/api/admin/config')
       if (response.ok) {
         const configData = await response.json()

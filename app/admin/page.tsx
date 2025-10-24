@@ -60,8 +60,18 @@ export default function AdminPage() {
 
   // Carica dati iniziali
   useEffect(() => {
+    console.log('Admin: Caricamento dati iniziali...')
     loadData()
   }, [])
+
+  // Debug: Mostra lo stato della configurazione
+  useEffect(() => {
+    console.log('Admin: Stato configurazione attuale:', config)
+    const localConfig = localStorage.getItem('lastello-config')
+    if (localConfig) {
+      console.log('Admin: Dati localStorage:', JSON.parse(localConfig))
+    }
+  }, [config])
 
   const loadData = async () => {
     setIsLoading(true)

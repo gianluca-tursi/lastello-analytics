@@ -127,7 +127,19 @@ export default function AdminPage() {
         // Aggiorna lo stato locale con i nuovi dati
         setConfig(responseData.config)
         
-        // I dati sono salvati nel file JSON, non serve localStorage
+        // Salva anche in localStorage per Netlify
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('lastello-config', JSON.stringify(configToSave))
+          console.log('Admin: Configurazione salvata anche in localStorage:', configToSave)
+          
+          // Notifica il cambiamento per aggiornare altri componenti
+          window.dispatchEvent(new StorageEvent('storage', {
+            key: 'lastello-config',
+            newValue: JSON.stringify(configToSave),
+            oldValue: localStorage.getItem('lastello-config')
+          }))
+          console.log('Admin: StorageEvent inviato per notificare il cambiamento')
+        }
         
         setMessage(responseData.message)
         

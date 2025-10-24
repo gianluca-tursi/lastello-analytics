@@ -67,10 +67,6 @@ export default function AdminPage() {
   // Debug: Mostra lo stato della configurazione
   useEffect(() => {
     console.log('Admin: Stato configurazione attuale:', config)
-    const localConfig = localStorage.getItem('lastello-config')
-    if (localConfig) {
-      console.log('Admin: Dati localStorage:', JSON.parse(localConfig))
-    }
   }, [config])
 
   const loadData = async () => {
@@ -126,35 +122,20 @@ export default function AdminPage() {
       console.log('Response data:', responseData)
 
       if (response.ok) {
-        // Salva SEMPRE in localStorage come backup principale
-        localStorage.setItem('lastello-config', JSON.stringify(configToSave))
-        console.log('Configurazione salvata in localStorage:', configToSave)
+        console.log('Configurazione salvata su file:', responseData.config)
         
-        // Notifica il cambiamento per aggiornare altri componenti
-        window.dispatchEvent(new StorageEvent('storage', {
-          key: 'lastello-config',
-          newValue: JSON.stringify(configToSave),
-          oldValue: localStorage.getItem('lastello-config')
-        }))
+        // Aggiorna lo stato locale con i nuovi dati
+        setConfig(responseData.config)
         
-        // Mostra messaggio basato sul tipo di salvataggio
-        const message = responseData.fileSaved 
-          ? 'Configurazione salvata su server e in locale!'
-          : 'Configurazione salvata in locale (modalità Netlify)!'
-        
-        setMessage(message)
+        setMessage('Configurazione salvata su file con successo!')
         
         // Verifica che i dati siano stati salvati correttamente
         setTimeout(() => {
-          const savedConfig = localStorage.getItem('lastello-config')
-          if (savedConfig) {
-            const parsed = JSON.parse(savedConfig)
-            console.log('Verifica salvataggio - Dati salvati:', parsed)
-            if (parsed.preventiviMeseCorrente === configToSave.preventiviMeseCorrente) {
-              console.log('✅ Salvataggio verificato con successo')
-            } else {
-              console.error('❌ Errore: Dati non salvati correttamente')
-            }
+          console.log('Verifica salvataggio - Dati salvati:', responseData.config)
+          if (responseData.config.preventiviMeseCorrente === configToSave.preventiviMeseCorrente) {
+            console.log('✅ Salvataggio verificato con successo')
+          } else {
+            console.error('❌ Errore: Dati non salvati correttamente')
           }
         }, 100)
         
